@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English-Dajun Translator</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f0f0f0;
+    }
+    textarea {
+        width: 45%;
+        height: 200px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .translate-btn {
+        font-size: 16px;
+        padding: 10px 20px;
+        background-color: #4caf50;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .translation-board {
+        width: 45%;
+        height: 200px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        overflow-y: auto;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <textarea id="englishTextarea" placeholder="Enter English text"></textarea>
+    <button class="translate-btn" onclick="translateToDajun()">Translate to English</button>
+    <br />
+    <br />
+    <textarea id="dajunTextarea" placeholder="Enter Dajun text"></textarea>
+    <button class="translate-btn" onclick="translateToEnglish()">Translate to Dajun</button>
+</div>
+
+<script>
+    const dajunMap = {
+        '⁛': 'a',
+        'ɷ': 'b',
+        '€': 'c',
+        '±': 'd',
+        '௹': 'e',
+        '⸘': 'f',
+        '﷼': 'g',
+        '‖': 'h',
+        '•': 'i',
+        '⇟': 'j',
+        '⏑': 'k',
+        '₷': 'l',
+        '✓': 'm',
+        '⟪': 'n',
+        '৲': 'o',
+        '₹': 'p',
+        '⁐': 'q',
+        '◔': 'r',
+        '◎': 's',
+        '⇲': 't',
+        '↢': 'u',
+        'ↁ': 'v',
+        '⅟': 'w',
+        '◣': 'x',
+        '◆': 'y',
+        '⫬': 'z'
+    };
+
+    function translateToDajun() {
+        const englishText = document.getElementById('englishTextarea').value.toLowerCase();
+        let dajunText = '';
+        for (let i = 0; i < englishText.length; i++) {
+            const char = englishText[i];
+            if (dajunMap[char]) {
+                dajunText += dajunMap[char];
+            } else {
+                dajunText += char;
+            }
+        }
+        document.getElementById('dajunTextarea').value = dajunText;
+    }
+
+    function translateToEnglish() {
+        const dajunText = document.getElementById('dajunTextarea').value.toLowerCase();
+        let englishText = '';
+        for (let i = 0; i < dajunText.length; i++) {
+            const char = dajunText[i];
+            if (Object.values(dajunMap).includes(char)) {
+                englishText += Object.keys(dajunMap).find(key => dajunMap[key] === char);
+            } else {
+                englishText += char;
+            }
+        }
+        document.getElementById('englishTextarea').value = englishText;
+    }
+</script>
+
+</body>
+</html>
