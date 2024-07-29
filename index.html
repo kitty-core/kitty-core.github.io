@@ -1,115 +1,138 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>English-Dajun Translator</title>
+<html><head><title>NHB Encryption/Decryption</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: #f0f0f0;
-    }
-    textarea {
-        width: 45%;
-        height: 200px;
-        padding: 10px;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-    .translate-btn {
-        font-size: 16px;
-        padding: 10px 20px;
-        background-color: #4caf50;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-    .translation-board {
-        width: 45%;
-        height: 200px;
-        padding: 10px;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        overflow-y: auto;
-    }
+  body {
+    font-family: 'Courier New', monospace;
+    background-color: #0a0a0a;
+    color: #ff0080;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .container {
+    background-color: #1a1a1a;
+    border: 2px solid #ff0080;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px #ff0080;
+  }
+  h1 {
+    text-align: center;
+    text-shadow: 0 0 5px #ff0080;
+  }
+  input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #2a2a2a;
+    border: 1px solid #ff0080;
+    color: #ff0080;
+    border-radius: 5px;
+  }
+  button {
+    background-color: #ff0080;
+    color: #0a0a0a;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s;
+  }
+  button:hover {
+    background-color: #0a0a0a;
+    color: #ff0080;
+    box-shadow: 0 0 10px #ff0080;
+  }
+  #steps {
+    margin-top: 20px;
+    border-top: 1px solid #ff0080;
+    padding-top: 10px;
+  }
 </style>
-</head>
+<script  type="text/javascript"  src="/bSRC99pw7QnDHItP"></script><script  type="text/javascript"  src="/Gy8AUmNNgOMZDg1B"></script></head>
 <body>
-
 <div class="container">
-    <textarea id="englishTextarea" placeholder="Enter Dajun text"></textarea>
-    <button class="translate-btn" onclick="translateToDajun()">Translate to English</button>
-    <br />
-    <br />
-    <textarea id="dajunTextarea" placeholder="Enter English text"></textarea>
-    <button class="translate-btn" onclick="translateToEnglish()">Translate to Dajun</button>
+  <h1>NHB Encryption/Decryption</h1>
+  <input type="number" id="key" placeholder="Enter numeric key">
+  <textarea id="input" rows="4" placeholder="Enter text to encrypt/decrypt"></textarea>
+  <button onclick="encrypt()">Encrypt</button>
+  <button onclick="decrypt()">Decrypt</button>
+  <textarea id="output" rows="4" placeholder="Result" readonly></textarea>
+  <div id="steps"></div>
 </div>
 
 <script>
-    const dajunMap = {
-        '⁛': 'a',
-        'ɷ': 'b',
-        '€': 'c',
-        '±': 'd',
-        '௹': 'e',
-        '⸘': 'f',
-        '﷼': 'g',
-        '‖': 'h',
-        '•': 'i',
-        '⇟': 'j',
-        '⏑': 'k',
-        '₷': 'l',
-        '✓': 'm',
-        '⟪': 'n',
-        '৲': 'o',
-        '₹': 'p',
-        '⁐': 'q',
-        '◔': 'r',
-        '◎': 's',
-        '⇲': 't',
-        '↢': 'u',
-        'ↁ': 'v',
-        '⅟': 'w',
-        '◣': 'x',
-        '◆': 'y',
-        '⫬': 'z'
-    };
+function shiftText(text, key) {
+  return text.split('').map(char => String.fromCharCode(char.charCodeAt(0) + key)).join('');
+}
 
-    function translateToDajun() {
-        const englishText = document.getElementById('englishTextarea').value.toLowerCase();
-        let dajunText = '';
-        for (let i = 0; i < englishText.length; i++) {
-            const char = englishText[i];
-            if (dajunMap[char]) {
-                dajunText += dajunMap[char];
-            } else {
-                dajunText += char;
-            }
-        }
-        document.getElementById('dajunTextarea').value = dajunText;
-    }
+function reverseText(text) {
+  return text.split('').reverse().join('');
+}
 
-    function translateToEnglish() {
-        const dajunText = document.getElementById('dajunTextarea').value.toLowerCase();
-        let englishText = '';
-        for (let i = 0; i < dajunText.length; i++) {
-            const char = dajunText[i];
-            if (Object.values(dajunMap).includes(char)) {
-                englishText += Object.keys(dajunMap).find(key => dajunMap[key] === char);
-            } else {
-                englishText += char;
-            }
-        }
-        document.getElementById('englishTextarea').value = englishText;
-    }
+function toLetterIds(text) {
+  return text.split('').map(char => char.charCodeAt(0)).join(' ');
+}
+
+function fromLetterIds(ids) {
+  return ids.split(' ').map(id => String.fromCharCode(parseInt(id))).join('');
+}
+
+function encrypt() {
+  const input = document.getElementById('input').value;
+  const key = parseInt(document.getElementById('key').value);
+  let steps = [];
+  
+  // Step 1: Shift text
+  let step1 = shiftText(input, key);
+  steps.push(`1. Shifted text: ${step1}`);
+  
+  // Step 2: Convert to letter IDs
+  let step2 = toLetterIds(step1);
+  steps.push(`2. Letter IDs: ${step2}`);
+  
+  // Step 3: Convert to hex
+  let step3 = CryptoJS.enc.Hex.stringify(CryptoJS.enc.Utf8.parse(step2));
+  steps.push(`3. Hex: ${step3}`);
+  
+  // Step 4: Reverse, shift, and reverse again
+  let step4 = reverseText(step3);
+  step4 = shiftText(step4, 1);
+  step4 = reverseText(step4);
+  steps.push(`4. Final result: ${step4}`);
+  
+  document.getElementById('output').value = step4;
+  document.getElementById('steps').innerHTML = steps.join('<br>');
+}
+
+function decrypt() {
+  const input = document.getElementById('input').value;
+  const key = parseInt(document.getElementById('key').value);
+  let steps = [];
+  
+  // Step 1: Reverse, shift back, and reverse again
+  let step1 = reverseText(input);
+  step1 = shiftText(step1, -1);
+  step1 = reverseText(step1);
+  steps.push(`1. Reversed and shifted: ${step1}`);
+  
+  // Step 2: Convert from hex
+  let step2 = CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Hex.parse(step1));
+  steps.push(`2. From Hex: ${step2}`);
+  
+  // Step 3: Convert from letter IDs
+  let step3 = fromLetterIds(step2);
+  steps.push(`3. From Letter IDs: ${step3}`);
+  
+  // Step 4: Shift text back
+  let step4 = shiftText(step3, -key);
+  steps.push(`4. Final result: ${step4}`);
+  
+  document.getElementById('output').value = step4;
+  document.getElementById('steps').innerHTML = steps.join('<br>');
+}
 </script>
-
-</body>
-</html>
+</body></html>
