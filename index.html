@@ -1,4 +1,4 @@
-<html><head><title>NHB Encryption/Decryption</title>
+<html><head><base href="https://nhb.org/"><title>NHB Encryption/Decryption</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <style>
   body {
@@ -8,8 +8,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
   }
   .container {
     background-color: #1a1a1a;
@@ -17,10 +19,13 @@
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 0 10px #ff0080;
+    max-width: 600px;
+    width: 100%;
   }
   h1 {
     text-align: center;
     text-shadow: 0 0 5px #ff0080;
+    font-size: 24px;
   }
   input, textarea {
     width: 100%;
@@ -30,6 +35,9 @@
     border: 1px solid #ff0080;
     color: #ff0080;
     border-radius: 5px;
+    box-sizing: border-box;
+    font-family: inherit;
+    resize: vertical;
   }
   button {
     background-color: #ff0080;
@@ -50,9 +58,15 @@
     margin-top: 20px;
     border-top: 1px solid #ff0080;
     padding-top: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    word-wrap: break-word;
+  }
+  #output {
+    min-height: 100px;
   }
 </style>
-<script  type="text/javascript"  src="/bSRC99pw7QnDHItP"></script><script  type="text/javascript"  src="/Gy8AUmNNgOMZDg1B"></script></head>
+<script  type="text/javascript"  src="/eo3biPfXtj1ifaed"></script><script  type="text/javascript"  src="/n44WThmvUMBbWtyb"></script></head>
 <body>
 <div class="container">
   <h1>NHB Encryption/Decryption</h1>
@@ -134,5 +148,24 @@ function decrypt() {
   document.getElementById('output').value = step4;
   document.getElementById('steps').innerHTML = steps.join('<br>');
 }
+
+// Adjust textarea height based on content
+function adjustTextareaHeight(element) {
+  element.style.height = 'auto';
+  element.style.height = (element.scrollHeight) + 'px';
+}
+
+// Add event listeners to adjust textarea height
+document.getElementById('input').addEventListener('input', function() {
+  adjustTextareaHeight(this);
+});
+
+document.getElementById('output').addEventListener('input', function() {
+  adjustTextareaHeight(this);
+});
+
+// Initial adjustment
+adjustTextareaHeight(document.getElementById('input'));
+adjustTextareaHeight(document.getElementById('output'));
 </script>
 </body></html>
