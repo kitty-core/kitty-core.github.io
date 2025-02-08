@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: black;
+    color: pink;
+    font-family: 'Orbitron', sans-serif;
+    overflow-x: hidden;
+}
+
+.background-cats {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cpath fill='%23FF69B4' d='M150 100c0 27.614-22.386 50-50 50s-50-22.386-50-50 22.386-50 50-50 50 22.386 50 50zm-50-40c-22.091 0-40 17.909-40 40s17.909 40 40 40 40-17.909 40-40-17.909-40-40-40z'/%3E%3Cpath fill='%23FF69B4' d='M150 100c0 27.614-22.386 50-50 50s-50-22.386-50-50 22.386-50 50-50 50 22.386 50 50z'/%3E%3C/svg%3E");
+    opacity: 0.1;
+    animation: scrollCats 30s linear infinite;
+    z-index: -1;
+}
+
+@keyframes scrollCats {
+    0% { background-position: 0 0; }
+    100% { background-position: 400px 400px; }
+}
+
+.container {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    color: pink;
+    text-shadow: 0 0 10px rgba(255,105,180,0.7);
+}
+
+.player-card {
+    background-color: rgba(255,105,180,0.1);
+    border: 2px solid pink;
+    border-radius: 10px;
+    margin: 15px 0;
+    padding: 15px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.player-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255,105,180,0.5);
+}
+
+.player-image {
+    max-width: 100%;
+    max-height: 400px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 10px;
+    border: 3px solid pink;
+}
