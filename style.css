@@ -16,7 +16,7 @@ body, html {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cpath fill='%23FF69B4' d='M150 100c0 27.614-22.386 50-50 50s-50-22.386-50-50 22.386-50 50-50 50 22.386 50 50zm-50-40c-22.091 0-40 17.909-40 40s17.909 40 40 40 40-17.909 40-40-17.909-40-40-40z'/%3E%3Cpath fill='%23FF69B4' d='M150 100c0 27.614-22.386 50-50 50s-50-22.386-50-50 22.386-50 50-50 50 22.386 50 50z'/%3E%3C/svg%3E");
+    background-image: url("https://static.vecteezy.com/system/resources/previews/029/462/010/non_2x/black-pink-cat-face-emoticon-wallpaper-free-vector.jpg");
     opacity: 0.1;
     animation: scrollCats 30s linear infinite;
     z-index: -1;
