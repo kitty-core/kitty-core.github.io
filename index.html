@@ -1,15 +1,366 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Kittycore's List of Mad Players</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TF2 Colored Chat Creator</title>
+    <style>
+        :root {
+            --tf2-bg: #1a1a1a;
+            --tf2-text: #d8d8d8;
+            --tf2-header: #ff9900;
+            --tf2-ui-bg: #36393f;
+            --tf2-ui-border: #ff7700;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--tf2-bg);
+            color: var(--tf2-text);
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: var(--tf2-header);
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+        }
+        
+        .output-container {
+            background-color: var(--tf2-ui-bg);
+            border: 2px solid var(--tf2-ui-border);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            min-height: 100px;
+            font-size: 16px;
+            position: relative;
+        }
+        
+        #output {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .input-section {
+            background-color: var(--tf2-ui-bg);
+            border: 2px solid var(--tf2-ui-border);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 100px;
+            background-color: #202225;
+            color: var(--tf2-text);
+            border: 1px solid #444;
+            border-radius: 3px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+        
+        .color-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .quality-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5);
+        }
+        
+        .color-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        input[type="color"] {
+            width: 40px;
+            height: 40px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        input[type="text"] {
+            background-color: #202225;
+            color: var(--tf2-text);
+            border: 1px solid #444;
+            border-radius: 3px;
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            background-color: #ff7700;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #ff9900;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #444;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .copy-btn:hover {
+            background-color: #666;
+        }
+        
+        .instructions {
+            background-color: var(--tf2-ui-bg);
+            border: 2px solid var(--tf2-ui-border);
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .instructions h3 {
+            color: var(--tf2-header);
+            margin-top: 0;
+        }
+        
+        .special-char {
+            display: inline-block;
+            background-color: #444;
+            color: #ff9900;
+            padding: 0 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            margin: 0 3px;
+        }
+        
+        .hex-display {
+            font-family: monospace;
+            padding: 2px 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+    </style>
 </head>
 <body>
-    <div class="background-cats"></div>
     <div class="container">
-        <h1>Kittycore's List of Mad Players</h1>
-        <div id="players-list"></div>
+        <h1>TF2 Colored Chat Creator</h1>
+        
+        <div class="output-container">
+            <div id="output">Type something below to see your colored chat message!</div>
+            <button class="copy-btn" onclick="copyOutput()">Copy</button>
+        </div>
+        
+        <div class="input-section">
+            <textarea id="message-input" placeholder="Type your message here or use the color buttons below" style="width: 96.5%;"></textarea>
+            
+            <h3 style="color: var(--tf2-header); margin-top: 10px;">Item Quality Colors:</h3>
+            <div class="color-section">
+                <button class="quality-btn" style="background-color: #FFD700" onclick="insertColor('FFD700', 'Unique')">Unique</button>
+                <button class="quality-btn" style="background-color: #476291" onclick="insertColor('476291', 'Vintage')">Vintage</button>
+                <button class="quality-btn" style="background-color: #CF6A32" onclick="insertColor('CF6A32', 'Strange')">Strange</button>
+                <button class="quality-btn" style="background-color: #4D7455" onclick="insertColor('4D7455', 'Genuine')">Genuine</button>
+                <button class="quality-btn" style="background-color: #38F3AB" onclick="insertColor('38F3AB', 'Haunted')">Haunted</button>
+                <button class="quality-btn" style="background-color: #AA0000" onclick="insertColor('AA0000', 'Collector\'s')">Collector's</button>
+                <button class="quality-btn" style="background-color: #FAFAFA;" onclick="insertColor('FAFAFA', 'Decorated')">Decorated</button>
+                <button class="quality-btn" style="background-color: #B2B2B2" onclick="insertColor('B2B2B2', 'Normal')">Normal</button>
+                <button class="quality-btn" style="background-color: #8650AC" onclick="insertColor('8650AC', 'Unusual')">Unusual</button>
+                <button class="quality-btn" style="background-color: #70B04A" onclick="insertColor('70B04A', 'Community')">Community</button>
+                <button class="quality-btn" style="background-color: #A50F79" onclick="insertColor('A50F79', 'Valve')">Valve</button>
+                <button class="quality-btn" style="background-color: #70B04A" onclick="insertColor('70B04A', 'Self-Made')">Self-Made</button>
+            </div>
+            
+            <h3 style="color: var(--tf2-header);">Custom Color:</h3>
+            <div class="color-picker-container">
+                <input type="color" id="color-picker" value="#FF0000" onchange="updateHexInput()">
+                <span>#</span>
+                <input type="text" id="hex-input" value="FF0000" maxlength="6" pattern="[0-9A-Fa-f]{6}" onchange="updateColorPicker()">
+                <button onclick="insertCustomColor()">Insert Color</button>
+            </div>
+            
+            <div class="action-buttons">
+                <button onclick="processText()">Update Preview</button>
+                <button onclick="clearText()">Clear All</button>
+            </div>
+        </div>
     </div>
-    <script type="module" src="script.js"></script>
+    
+    <script>
+        const messageInput = document.getElementById('message-input');
+        const output = document.getElementById('output');
+        const colorPicker = document.getElementById('color-picker');
+        const hexInput = document.getElementById('hex-input');
+        
+        // Bell character (ASCII 7/hex 07)
+        const BELL_CHAR = String.fromCharCode(7);
+        
+        // Process text on input
+        messageInput.addEventListener('input', function() {
+            processText();
+        });
+        
+        function processText() {
+            const text = messageInput.value;
+            // Using a regex that looks for the bell character, "color!", bell character, and hex code
+            const colorRegex = new RegExp(BELL_CHAR + "color!" + BELL_CHAR + "([0-9A-Fa-f]{6})([^" + BELL_CHAR + "]*)", "g");
+            
+            let result = '';
+            let lastIndex = 0;
+            let match;
+            
+            output.innerHTML = '';
+            
+            // Check if there are any color tags
+            if (text.includes(BELL_CHAR + "color!" + BELL_CHAR)) {
+                while ((match = colorRegex.exec(text)) !== null) {
+                    // Add text before the match if not at the beginning
+                    if (match.index > lastIndex) {
+                        const plainText = document.createTextNode(text.substring(lastIndex, match.index));
+                        output.appendChild(plainText);
+                    }
+                    
+                    // Add the colored text
+                    const colorCode = match[1];
+                    const coloredText = match[2];
+                    
+                    const span = document.createElement('span');
+                    span.style.color = `#${colorCode}`;
+                    span.textContent = coloredText;
+                    output.appendChild(span);
+                    
+                    lastIndex = colorRegex.lastIndex;
+                }
+                
+                // Add any remaining text
+                if (lastIndex < text.length) {
+                    const plainText = document.createTextNode(text.substring(lastIndex));
+                    output.appendChild(plainText);
+                }
+            } else {
+                // No color tags, just display the text normally
+                output.textContent = text;
+            }
+            
+            // If no text, show placeholder
+            if (output.innerHTML === '') {
+                output.textContent = 'Type something below to see your colored chat message!';
+            }
+        }
+        
+        function insertColor(hexCode, qualityName) {
+            const selectionStart = messageInput.selectionStart;
+            const selectionEnd = messageInput.selectionEnd;
+            const currentValue = messageInput.value;
+            
+            // Create the color tag with bell characters
+            const colorTag = BELL_CHAR + "color!" + BELL_CHAR + hexCode;
+            const selectedText = currentValue.substring(selectionStart, selectionEnd);
+            
+            const newText = currentValue.substring(0, selectionStart) + 
+                            colorTag + selectedText + 
+                            currentValue.substring(selectionEnd);
+            
+            messageInput.value = newText;
+            messageInput.focus();
+            
+            // Set cursor position after the inserted text
+            const newPosition = selectionStart + colorTag.length + selectedText.length;
+            messageInput.selectionStart = newPosition;
+            messageInput.selectionEnd = newPosition;
+            
+            processText();
+        }
+        
+        function insertCustomColor() {
+            insertColor(hexInput.value, 'Custom');
+        }
+        
+        function updateHexInput() {
+            hexInput.value = colorPicker.value.substring(1).toUpperCase();
+        }
+        
+        function updateColorPicker() {
+            // Ensure valid hex
+            let hex = hexInput.value;
+            hex = hex.replace(/[^0-9A-Fa-f]/g, '');
+            
+            // Pad to 6 characters if needed
+            while (hex.length < 6) {
+                hex += '0';
+            }
+            
+            // Truncate if longer than 6
+            if (hex.length > 6) {
+                hex = hex.substring(0, 6);
+            }
+            
+            hexInput.value = hex.toUpperCase();
+            colorPicker.value = `#${hex}`;
+        }
+        
+        function clearText() {
+            messageInput.value = '';
+            processText();
+        }
+        
+        function copyOutput() {
+            const outputText = messageInput.value;
+            
+            if (outputText.trim() === '') {
+                alert('No text to copy!');
+                return;
+            }
+            
+            navigator.clipboard.writeText(outputText).then(() => {
+                alert('Text copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                alert('Failed to copy text. Please try manually selecting and copying.');
+            });
+        }
+    </script>
 </body>
 </html>
