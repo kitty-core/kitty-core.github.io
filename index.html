@@ -186,6 +186,10 @@
     </style>
 </head>
 <body>
+    <div class="instructions">
+        <h3>HOW DOES IT WORK!?</h3>
+        <p>Copy & paste into chat, and boom! <span class="special-char">NOTE : you NEED to be either dead, or saying it in TEAM CHAT.</span>
+    </div>
     <div class="container">
         <h1>TF2 Colored Chat Creator</h1>
         
@@ -242,6 +246,8 @@
                 <button class="quality-btn" style="background-color: #7C6C57" onclick="insertColor('7C6C57', 'Ye Olde Rustic Colour')">Ye Olde Rustic Colour</button>
                 <button class="quality-btn" style="background-color: #424F3B" onclick="insertColor('424F3B', 'Zepheniah\'s Greed')">Zepheniah's Greed</button>
             </div>
+            <h3 style="color: var(--tf2-header); margin-top: 10px;">Other:</h3>
+            <button class="quality-btn" style="background-color: #9ec34f" onclick="insertColor('9ec34f', 'Achievement')">Achievement</button>
             <h3 style="color: var(--tf2-header);">Custom Color:</h3>
             <div class="color-picker-container">
                 <input type="color" id="color-picker" value="#FF0000" onchange="updateHexInput()">
@@ -256,10 +262,7 @@
             </div>
         </div>
     </div>
-    <div class="instructions">
-        <h3>HOW DOES IT WORK!?</h3>
-        <p>Copy & paste into chat, and boom! <span class="special-char">NOTE : you NEED to be either dead, or saying it in TEAM CHAT.</span>
-    </div>
+    
     <script>
         const messageInput = document.getElementById('message-input');
         const output = document.getElementById('output');
