@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clangen Patrol Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+    <div class="flex h-screen">
+        <aside class="w-1/3 max-w-sm bg-white p-6 shadow-lg flex flex-col h-full">
+            <header class="mb-6 pb-6 border-b border-slate-200">
+                <h1 class="text-2xl font-bold text-slate-700">Patrol Editor</h1>
+                <p class="text-sm text-slate-500">Load, view, and edit patrols.</p>
+            </header>
+            
+            <div class="flex items-center space-x-2 mb-4">
+                <label for="file-upload" class="flex-1 cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg text-center transition-colors duration-200">
+                    Load Patrol JSON
+                </label>
+                <input id="file-upload" type="file" class="hidden" accept=".json" multiple>
+            </div>
+            <button id="add-new-patrol-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 mb-4">Add New Patrol</button>
+
+            <div class="mb-4">
+                <label for="filter-input" class="block text-sm font-medium text-slate-600 mb-1">Filter by ID or Tag</label>
+                <input type="text" id="filter-input" placeholder="e.g., gen_bord_dog1 or new_cat" class="w-full p-3 border border-slate-300 rounded-md shadow-sm">
+            </div>
+
+            <div class="flex-grow overflow-y-auto custom-scrollbar pr-2">
+                <h2 class="text-lg font-semibold mb-2 text-slate-600">Patrols</h2>
+                <ul id="patrol-list" class="space-y-1"></ul>
+            </div>
+
+            <footer class="mt-6 pt-6 border-t border-slate-200 space-y-2">
+                <button id="download-btn" class="w-full bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 disabled:bg-slate-400 disabled:cursor-not-allowed" disabled>
+                    Download Updated JSON
+                </button>
+                 <p class="text-xs text-slate-500 text-center px-2">
+                    Note: Windows may "block" downloaded files for security. If you can't open it, right-click the file, go to Properties, and check "Unblock".
+                </p>
+                <button id="credits-btn" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                    Credits
+                </button>
+            </footer>
+        </aside>
+
+        <main id="main-content" class="flex-grow p-8 overflow-y-auto custom-scrollbar">
+            <div id="welcome-screen" class="flex flex-col items-center justify-center h-full text-center bg-white rounded-xl shadow-md p-8">
+                <h2 class="text-3xl font-bold text-slate-600 mb-2">Welcome to the Clangen Patrol Editor</h2>
+                <p class="text-slate-500">Load a patrol JSON file to begin editing. Loading a new file will replace the current patrol list.</p>
+            </div>
+            <div id="editor-screen" class="hidden">
+                <form id="patrol-form"></form>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white py-3 px-5 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-50"></div>
+
+    <div id="credits-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-slate-700">Credits</h2>
+                <button id="close-credits-btn" class="text-gray-500 hover:text-gray-800 text-2xl leading-none">&times;</button>
+            </div>
+            <div class="space-y-4 text-slate-600">
+                <p><span class="font-semibold">Main Site, Idea, & General functionality:</span> Maya/Floofyfern</p>
+                <p><span class="font-semibold">Extra Functionality In Options:</span> __lago (Discord)</p>
+                <p><span class="font-semibold">CSS & Bugfixes:</span> Gemini AI (I could not be bothered to do CSS or bugfix some annoying bugs)</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
