@@ -4,45 +4,217 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TF2 Colored Chat Creator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Oswald:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --tf2-bg: #1a1a1a;
             --tf2-text: #d8d8d8;
             --tf2-header: #ff9900;
-            --tf2-ui-bg: #36393f;
+            --tf2-ui-bg: #2a2c30;
+            --tf2-ui-bg-darker: #202225;
             --tf2-ui-border: #ff7700;
+            --tf2-sidebar-bg: #111111;
         }
         
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* --- Keyframe Animations --- */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
         body {
-            font-family: 'Courier New', monospace;
+            /* Use Oswald for headers, Roboto Mono for the rest */
+            font-family: 'Roboto Mono', monospace;
             background-color: var(--tf2-bg);
             color: var(--tf2-text);
-            margin: 0;
-            padding: 20px;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
         }
         
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
+        h1, h2, h3 {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+        
+        /* --- Scrollbar Styling --- */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--tf2-ui-bg-darker);
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--tf2-ui-border);
+        }
+
+        /* --- Sidebar Navigation --- */
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            background-color: var(--tf2-sidebar-bg);
+            border-right: 2px solid var(--tf2-ui-border);
+            padding: 20px;
+            flex-shrink: 0;
+            animation: slideInFromLeft 0.5s ease-out;
+        }
+
+        .sidebar h2 {
+            color: var(--tf2-header);
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+        }
+
+        .sidebar nav li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav a {
+            color: var(--tf2-text);
+            text-decoration: none;
+            font-size: 1rem;
+            padding: 8px 12px;
+            display: block;
+            border-radius: 4px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .sidebar nav a:hover {
+            background-color: var(--tf2-ui-border);
+            color: var(--tf2-bg);
+            transform: translateX(5px);
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar nav a.active {
+            background-color: var(--tf2-ui-bg);
+            color: var(--tf2-header);
+            font-weight: bold;
+        }
+
+        /* --- Main Content Area --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            height: 100vh;
+            overflow-y: auto;
         }
         
         h1 {
             color: var(--tf2-header);
             text-align: center;
-            text-transform: uppercase;
-            font-weight: bold;
-            letter-spacing: 1px;
-            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
             text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 0.5s ease-out 0.1s backwards;
+        }
+
+        .instructions {
+            background-color: var(--tf2-ui-bg);
+            border: 1px solid #444;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 0.5s ease-out 0.2s backwards;
+        }
+
+        .instructions h3 {
+            color: var(--tf2-header);
+            margin-top: 0;
+            font-size: 1.2rem;
+        }
+
+        .instructions .special-char {
+            display: inline-block;
+            background-color: #444;
+            color: #ff9900;
+            padding: 0 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            margin: 0 3px;
         }
         
-        .output-container {
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .ui-panel {
             background-color: var(--tf2-ui-bg);
-            border: 2px solid var(--tf2-ui-border);
+            border: 1px solid #444;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            padding: 20px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        
+        .ui-panel:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Staggered animation for the panels */
+        .left-column .ui-panel {
+            animation: fadeInUp 0.5s ease-out 0.3s backwards;
+        }
+        .right-column .ui-panel {
+            animation: fadeInUp 0.5s ease-out 0.4s backwards;
+        }
+
+        
+        .output-container {
+            background-color: var(--tf2-ui-bg-darker);
+            border: 1px solid #444;
             border-radius: 5px;
             padding: 15px;
             margin-bottom: 20px;
-            min-height: 100px;
+            min-height: 120px;
             font-size: 16px;
             position: relative;
         }
@@ -50,28 +222,37 @@
         #output {
             white-space: pre-wrap;
             word-break: break-word;
-        }
-        
-        .input-section {
-            background-color: var(--tf2-ui-bg);
-            border: 2px solid var(--tf2-ui-border);
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 20px;
+            min-height: 80px;
+            transition: color 0.3s ease;
         }
         
         textarea {
             width: 100%;
-            height: 100px;
-            background-color: #202225;
+            height: 120px;
+            background-color: var(--tf2-ui-bg-darker);
             color: var(--tf2-text);
             border: 1px solid #444;
             border-radius: 3px;
             padding: 10px;
-            font-family: 'Courier New', monospace;
+            font-family: 'Roboto Mono', monospace;
             font-size: 16px;
             resize: vertical;
             margin-bottom: 10px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--tf2-ui-border);
+            box-shadow: 0 0 10px rgba(255, 119, 0, 0.3);
+        }
+
+        .ui-panel h3 {
+            color: var(--tf2-header);
+            margin-top: 10px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 8px;
+            font-size: 1.2rem;
         }
         
         .color-section {
@@ -79,6 +260,15 @@
             flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 15px;
+        }
+        
+        .scrollable-section {
+            max-height: 250px;
+            overflow-y: auto;
+            background-color: var(--tf2-ui-bg-darker);
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #333;
         }
         
         .quality-btn {
@@ -89,6 +279,13 @@
             font-weight: bold;
             color: #fff;
             text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+
+        .quality-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            filter: brightness(1.2);
         }
         
         .color-picker-container {
@@ -101,26 +298,41 @@
         input[type="color"] {
             width: 40px;
             height: 40px;
-            border: none;
+            border: 1px solid #444;
             cursor: pointer;
+            padding: 0;
+            border-radius: 4px;
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+        input[type="color"]:hover {
+            transform: scale(1.1);
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
         }
         
         input[type="text"] {
-            background-color: #202225;
+            background-color: var(--tf2-ui-bg-darker);
             color: var(--tf2-text);
             border: 1px solid #444;
             border-radius: 3px;
             padding: 8px;
-            font-family: 'Courier New', monospace;
+            font-family: 'Roboto Mono', monospace;
+            width: 100px;
         }
         
         .action-buttons {
             display: flex;
             gap: 10px;
+            margin-top: 20px;
         }
         
         button {
-            background-color: #ff7700;
+            background-color: var(--tf2-ui-border);
             color: white;
             border: none;
             border-radius: 3px;
@@ -129,11 +341,20 @@
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
-            transition: background-color 0.2s;
+            font-family: 'Oswald', sans-serif; /* Changed to Oswald */
+            font-size: 1rem;
+            transition: all 0.2s ease-in-out;
         }
         
         button:hover {
-            background-color: #ff9900;
+            background-color: var(--tf2-header); /* Keep this for a brighter feel */
+            transform: scale(1.03);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            filter: brightness(1.1);
+        }
+
+        button:active {
+            transform: scale(0.98);
         }
         
         .copy-btn {
@@ -142,136 +363,130 @@
             right: 10px;
             background-color: #444;
             color: #fff;
-            border: none;
-            border-radius: 3px;
             padding: 5px 10px;
-            cursor: pointer;
             font-size: 12px;
+            font-family: 'Roboto Mono', monospace; /* Keep this font */
+            letter-spacing: 0.5px;
+            z-index: 10;
         }
         
         .copy-btn:hover {
             background-color: #666;
-        }
-        
-        .instructions {
-            background-color: var(--tf2-ui-bg);
-            border: 2px solid var(--tf2-ui-border);
-            border-radius: 5px;
-            padding: 15px;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-
-        .instructions h3 {
-            color: var(--tf2-header);
-            margin-top: 0;
-        }
-        
-        .special-char {
-            display: inline-block;
-            background-color: #444;
-            color: #ff9900;
-            padding: 0 5px;
-            border-radius: 3px;
-            font-family: monospace;
-            margin: 0 3px;
-        }
-        
-        .hex-display {
-            font-family: monospace;
-            padding: 2px 5px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
-    <div class="instructions">
-        <h3>HOW DOES IT WORK!?</h3>
-        <p>Copy & paste into chat, and boom! <span class="special-char">NOTE : you NEED to be either dead, or saying it in TEAM CHAT.</span>
+
+    <div class="sidebar">
+        <h2>Kitty-Core</h2>
+        <nav>
+            <ul>
+                <li><a href="#" class="active">TF2 Chat Creator</a></li>
+                <li><a href="https://kitty-core.github.io/clangen">Clangen Patrol Editor</a></li>
+                </ul>
+        </nav>
     </div>
-    <div class="container">
+
+    <div class="main-content">
         <h1>TF2 Colored Chat Creator</h1>
-        
-        <div class="output-container">
-            <div id="output">Type something below to see your colored chat message!</div>
-            <button class="copy-btn" onclick="copyOutput()">Copy</button>
+
+        <div class="instructions">
+            <h3>HOW DOES IT WORK!?</h3>
+            <p>Type in the box, use the buttons to add color codes, then copy the text.
+            <br>
+            Paste it into the TF2 chat. <span class="special-char">NOTE: This only works in TEAM CHAT (or when you are dead).</span>
+            </p>
         </div>
         
-        <div class="input-section">
-            <textarea id="message-input" placeholder="Type your message here or use the color buttons below" style="width: 96.5%;"></textarea>
-            
-            <h3 style="color: var(--tf2-header); margin-top: 10px;">Item Quality Colors:</h3>
-            
-            <div class="color-section">
-                <button class="quality-btn" style="background-color: #FFD700" onclick="insertColor('FFD700', 'Unique')">Unique</button>
-                <button class="quality-btn" style="background-color: #476291" onclick="insertColor('476291', 'Vintage')">Vintage</button>
-                <button class="quality-btn" style="background-color: #CF6A32" onclick="insertColor('CF6A32', 'Strange')">Strange</button>
-                <button class="quality-btn" style="background-color: #4D7455" onclick="insertColor('4D7455', 'Genuine')">Genuine</button>
-                <button class="quality-btn" style="background-color: #38F3AB" onclick="insertColor('38F3AB', 'Haunted')">Haunted</button>
-                <button class="quality-btn" style="background-color: #AA0000" onclick="insertColor('AA0000', 'Collector\'s')">Collector's</button>
-                <button class="quality-btn" style="background-color: #FAFAFA;" onclick="insertColor('FAFAFA', 'Decorated')">Decorated</button>
-                <button class="quality-btn" style="background-color: #B2B2B2" onclick="insertColor('B2B2B2', 'Normal')">Normal</button>
-                <button class="quality-btn" style="background-color: #8650AC" onclick="insertColor('8650AC', 'Unusual')">Unusual</button>
-                <button class="quality-btn" style="background-color: #70B04A" onclick="insertColor('70B04A', 'Community')">Community</button>
-                <button class="quality-btn" style="background-color: #A50F79" onclick="insertColor('A50F79', 'Valve')">Valve</button>
-                <button class="quality-btn" style="background-color: #70B04A" onclick="insertColor('70B04A', 'Self-Made')">Self-Made</button>
+        <div class="app-grid">
+            <div class="left-column">
+                <div class="ui-panel">
+                    <h3>Preview:</h3>
+                    <div class="output-container">
+                        <div id="output">Type something below to see your colored chat message!</div>
+                        <button class="copy-btn" onclick="copyOutput()">Copy</button>
+                    </div>
+                    <h3>Input:</h3>
+                    <textarea id="message-input" placeholder="Type your message here..."></textarea>
+                    <div class="action-buttons">
+                        <button onclick="clearText()" style="background-color: #555;">Clear All</button>
+                    </div>
+                </div>
             </div>
-            <h3 style="color: var(--tf2-header); margin-top: 10px;">Common Colors:</h3>
-            <div class="color-section">
-                <button class="quality-btn" style="background:#FBECCB" onclick="insertColor('FBECCB','RESET')">RESET</button>
-                <button class="quality-btn" style="background:#FF0000" onclick="insertColor('FF0000','Red')">Red</button>
-                <button class="quality-btn" style="background:#FFA500" onclick="insertColor('FFA500','Orange')">Orange</button>
-                <button class="quality-btn" style="background:#FFFF00" onclick="insertColor('FFFF00','Yellow')">Yellow</button>
-                <button class="quality-btn" style="background:#008000" onclick="insertColor('00FF00','Green')">Green</button>
-                <button class="quality-btn" style="background:#0000FF" onclick="insertColor('0000FF','Blue')">Blue</button>
-                <button class="quality-btn" style="background:#4B0082" onclick="insertColor('4B0082','Indigo')">Indigo</button>
-                <button class="quality-btn" style="background:#EE82EE" onclick="insertColor('EE82EE','Violet')">Violet</button>
-                <button class="quality-btn" style="background:#FFAAAA" onclick="insertColor('FFAAAA','Pink')">Pink</button>
-            </div>
-            <h3 style="color: var(--tf2-header); margin-top: 10px;">Teams:</h3>
-            <div class="color-section">
-                <button class="quality-btn" style="background-color: #bd3b3b" onclick="insertColor('D55253', 'RED')">RED</button>
-                <button class="quality-btn" style="background-color: #395c78" onclick="insertColor('AFD8FF', 'BLU')">BLU</button>
-            </div>
-            <h3 style="color: var(--tf2-header); margin-top: 10px;">Paints:</h3>
-            <div class="color-section">
-                <button class="quality-btn" style="background-color: #2F4F4F" onclick="insertColor('2F4F4F', 'A Color Similar to Slate')">A Color Similar to Slate</button>
-                <button class="quality-btn" style="background-color: #7D4071" onclick="insertColor('7D4071', 'A Deep Commitment to Purple')">A Deep Commitment to Purple</button>
-                <button class="quality-btn" style="background-color: #141414" onclick="insertColor('141414', 'A Distinctive Lack of Hue')">A Distinctive Lack of Hue</button>
-                <button class="quality-btn" style="background-color: #BCDDB3" onclick="insertColor('BCDDB3', 'A Mann\'s Mint')">A Mann's Mint</button>
-                <button class="quality-btn" style="background-color: #2D2D24" onclick="insertColor('2D2D24', 'After Eight')">After Eight</button>
-                <button class="quality-btn" style="background-color: #7E7E7E" onclick="insertColor('7E7E7E', 'Aged Moustache Grey')">Aged Moustache Grey</button>
-                <button class="quality-btn" style="background-color: #E6E6E6" onclick="insertColor('E6E6E6', 'An Extraordinary Abundance of Tinge')">An Extraordinary Abundance of Tinge</button>
-                <button class="quality-btn" style="background-color: #E7B53B" onclick="insertColor('E7B53B', 'Australium Gold')">Australium Gold</button>
-                <button class="quality-btn" style="background-color: #D8BED8" onclick="insertColor('D8BED8', 'Color No. 216-190-216')">Color No. 216-190-216</button>
-                <button class="quality-btn" style="background-color: #E9967A" onclick="insertColor('E9967A', 'Dark Salmon Injustice')">Dark Salmon Injustice</button>
-                <button class="quality-btn" style="background-color: #808000" onclick="insertColor('808000', 'Drably Olive')">Drably Olive</button>
-                <button class="quality-btn" style="background-color: #729E42" onclick="insertColor('729E42', 'Indubitably Green')">Indubitably Green</button>
-                <button class="quality-btn" style="background-color: #CF7336" onclick="insertColor('CF7336', 'Mann Co. Orange')">Mann Co. Orange</button>
-                <button class="quality-btn" style="background-color: #A57545" onclick="insertColor('A57545', 'Muskelmannbraun')">Muskelmannbraun</button>
-                <button class="quality-btn" style="background-color: #51384A" onclick="insertColor('51384A', 'Noble Hatter\'s Violet')">Noble Hatter's Violet</button>
-                <button class="quality-btn" style="background-color: #C5AF91" onclick="insertColor('C5AF91', 'Peculiarly Drab Tincture')">Peculiarly Drab Tincture</button>
-                <button class="quality-btn" style="background-color: #FF69B4" onclick="insertColor('FF69B4', 'Pink as Hell')">Pink as Hell</button>
-                <button class="quality-btn" style="background-color: #694D3A" onclick="insertColor('694D3A', 'Radigan Conagher Brown')">Radigan Conagher Brown</button>
-                <button class="quality-btn" style="background-color: #32CD32" onclick="insertColor('32CD32', 'The Bitter Taste of Defeat and Lime')">The Bitter Taste of Defeat and Lime</button>
-                <button class="quality-btn" style="background-color: #F0E68C" onclick="insertColor('F0E68C', 'The Color of a Gentlemann\'s Business Pants')">The Color of a Gentlemann's Business Pants</button>
-                <button class="quality-btn" style="background-color: #7C6C57" onclick="insertColor('7C6C57', 'Ye Olde Rustic Colour')">Ye Olde Rustic Colour</button>
-                <button class="quality-btn" style="background-color: #424F3B" onclick="insertColor('424F3B', 'Zepheniah\'s Greed')">Zepheniah's Greed</button>
-            </div>
-            <h3 style="color: var(--tf2-header); margin-top: 10px;">Other:</h3>
-            <button class="quality-btn" style="background-color: #9ec34f" onclick="insertColor('9ec34f', 'Achievement')">Achievement</button>
-            <h3 style="color: var(--tf2-header);">Custom Color:</h3>
-            <div class="color-picker-container">
-                <input type="color" id="color-picker" value="#FF0000" onchange="updateHexInput()">
-                <span>#</span>
-                <input type="text" id="hex-input" value="FF0000" maxlength="6" pattern="[0-9A-Fa-f]{6}" onchange="updateColorPicker()">
-                <button onclick="insertCustomColor()">Insert Color</button>
-            </div>
-            
-            <div class="action-buttons">
-                <button onclick="processText()">Update Preview</button>
-                <button onclick="clearText()">Clear All</button>
+
+            <div class="right-column">
+                <div class="ui-panel">
+                    <h3>Custom Color:</h3>
+                    <div class="color-picker-container">
+                        <input type="color" id="color-picker" value="#FF0000" onchange="updateHexInput()">
+                        <span>#</span>
+                        <input type="text" id="hex-input" value="FF0000" maxlength="6" pattern="[0-9A-Fa-f]{6}" onchange="updateColorPicker()">
+                        <button onclick="insertCustomColor()">Insert</button>
+                    </div>
+
+                    <h3>Item Quality Colors:</h3>
+                    <div class="color-section">
+                        <button class="quality-btn" style="background-color: #FFD700" onclick="insertColor('FFD700', 'Unique')" title="Unique">Unique</button>
+                        <button class="quality-btn" style="background-color: #476291" onclick="insertColor('476291', 'Vintage')" title="Vintage">Vintage</button>
+                        <button class="quality-btn" style="background-color: #CF6A32" onclick="insertColor('CF6A32', 'Strange')" title="Strange">Strange</button>
+                        <button class="quality-btn" style="background-color: #4D7455" onclick="insertColor('4D7455', 'Genuine')" title="Genuine">Genuine</button>
+                        <button class="quality-btn" style="background-color: #38F3AB" onclick="insertColor('38F3AB', 'Haunted')" title="Haunted">Haunted</button>
+                        <button class="quality-btn" style="background-color: #AA0000" onclick="insertColor('AA0000', 'Collector\'s')" title="Collector's">Collector's</button>
+                        <button class="quality-btn" style="background-color: #FAFAFA; color: #333; text-shadow: none;" onclick="insertColor('FAFAFA', 'Decorated')" title="Decorated">Decorated</button>
+                        <button class="quality-btn" style="background-color: #B2B2B2" onclick="insertColor('B2B2B2', 'Normal')" title="Normal">Normal</button>
+                        <button class="quality-btn" style="background-color: #8650AC" onclick="insertColor('8650AC', 'Unusual')" title="Unusual">Unusual</button>
+                        <button class="quality-btn" style="background-color: #70B04A" onclick="insertColor('70B04A', 'Community')" title="Community">Community</button>
+                        <button class="quality-btn" style="background-color: #A50F79" onclick="insertColor('A50F79', 'Valve')" title="Valve">Valve</button>
+                        <button class="quality-btn" style="background-color: #70B04A" onclick="insertColor('70B04A', 'Self-Made')" title="Self-Made">Self-Made</button>
+                    </div>
+
+                    <h3>Common Colors:</h3>
+                    <div class="color-section">
+                        <button class="quality-btn" style="background:#FBECCB; color: #333; text-shadow: none;" onclick="insertColor('FBECCB','RESET')" title="RESET (Default Chat Color)">RESET</button>
+                        <button class="quality-btn" style="background:#FF0000" onclick="insertColor('FF0000','Red')" title="Red">Red</button>
+                        <button class="quality-btn" style="background:#FFA500" onclick="insertColor('FFA500','Orange')" title="Orange">Orange</button>
+                        <button class="quality-btn" style="background:#FFFF00; color: #333; text-shadow: none;" onclick="insertColor('FFFF00','Yellow')" title="Yellow">Yellow</button>
+                        <button class="quality-btn" style="background:#00FF00" onclick="insertColor('00FF00','Green')" title="Green">Green</button>
+                        <button class="quality-btn" style="background:#0000FF" onclick="insertColor('0000FF','Blue')" title="Blue">Blue</button>
+                        <button class="quality-btn" style="background:#4B0082" onclick="insertColor('4B0082','Indigo')" title="Indigo">Indigo</button>
+                        <button class="quality-btn" style="background:#EE82EE" onclick="insertColor('EE82EE','Violet')" title="Violet">Violet</button>
+                        <button class="quality-btn" style="background:#FFAAAA" onclick="insertColor('FFAAAA','Pink')" title="Pink">Pink</button>
+                    </div>
+
+                    <h3>Teams & Other:</h3>
+                    <div class="color-section">
+                        <button class="quality-btn" style="background-color: #bd3b3b" onclick="insertColor('D55253', 'RED')" title="RED">RED</button>
+                        <button class="quality-btn" style="background-color: #395c78" onclick="insertColor('AFD8FF', 'BLU')" title="BLU">BLU</button>
+                        <button class="quality-btn" style="background-color: #9ec34f" onclick="insertColor('9ec34f', 'Achievement')" title="Achievement">Achievement</button>
+                    </div>
+
+                    <h3>Paints:</h3>
+                    <div class="color-section scrollable-section">
+                        <button class="quality-btn" style="background-color: #2F4F4F" onclick="insertColor('2F4F4F', 'A Color Similar to Slate')" title="A Color Similar to Slate">Slate</button>
+                        <button class="quality-btn" style="background-color: #7D4071" onclick="insertColor('7D4071', 'A Deep Commitment to Purple')" title="A Deep Commitment to Purple">Purple</button>
+                        <button class="quality-btn" style="background-color: #141414" onclick="insertColor('141414', 'A Distinctive Lack of Hue')" title="A Distinctive Lack of Hue">Black</button>
+                        <button class="quality-btn" style="background-color: #BCDDB3; color: #333; text-shadow: none;" onclick="insertColor('BCDDB3', 'A Mann\'s Mint')" title="A Mann's Mint">Mint</button>
+                        <button class="quality-btn" style="background-color: #2D2D24" onclick="insertColor('2D2D24', 'After Eight')" title="After Eight">After Eight</button>
+                        <button class="quality-btn" style="background-color: #7E7E7E" onclick="insertColor('7E7E7E', 'Aged Moustache Grey')" title="Aged Moustache Grey">Grey</button>
+                        <button class="quality-btn" style="background-color: #E6E6E6; color: #333; text-shadow: none;" onclick="insertColor('E6E6E6', 'An Extraordinary Abundance of Tinge')" title="An Extraordinary Abundance of Tinge">White</button>
+                        <button class="quality-btn" style="background-color: #E7B53B" onclick="insertColor('E7B53B', 'Australium Gold')" title="Australium Gold">Australium</button>
+                        <button class="quality-btn" style="background-color: #D8BED8; color: #333; text-shadow: none;" onclick="insertColor('D8BED8', 'Color No. 216-190-216')" title="Color No. 216-190-216">216-190-216</button>
+                        <button class="quality-btn" style="background-color: #E9967A" onclick="insertColor('E9967A', 'Dark Salmon Injustice')" title="Dark Salmon Injustice">Salmon</button>
+                        <button class="quality-btn" style="background-color: #808000" onclick="insertColor('808000', 'Drably Olive')" title="Drably Olive">Olive</button>
+                        <button class="quality-btn" style="background-color: #729E42" onclick="insertColor('729E42', 'Indubitably Green')" title="Indubitably Green">Green</button>
+                        <button class="quality-btn" style="background-color: #CF7336" onclick="insertColor('CF7336', 'Mann Co. Orange')" title="Mann Co. Orange">Mann Co.</button>
+                        <button class="quality-btn" style="background-color: #A57545" onclick="insertColor('A57545', 'Muskelmannbraun')" title="Muskelmannbraun">Brown</button>
+                        <button class="quality-btn" style="background-color: #51384A" onclick="insertColor('51384A', 'Noble Hatter\'s Violet')" title="Noble Hatter's Violet">Violet</button>
+                        <button class="quality-btn" style="background-color: #C5AF91; color: #333; text-shadow: none;" onclick="insertColor('C5AF91', 'Peculiarly Drab Tincture')" title="Peculiarly Drab Tincture">Tincture</button>
+                        <button class="quality-btn" style="background-color: #FF69B4" onclick="insertColor('FF69B4', 'Pink as Hell')" title="Pink as Hell">Pink</button>
+                        <button class="quality-btn" style="background-color: #694D3A" onclick="insertColor('694D3A', 'Radigan Conagher Brown')" title="Radigan Conagher Brown">Conagher</button>
+                        <button class="quality-btn" style="background-color: #32CD32" onclick="insertColor('32CD32', 'The Bitter Taste of Defeat and Lime')" title="The Bitter Taste of Defeat and Lime">Lime</button>
+                        <button class="quality-btn" style="background-color: #F0E68C; color: #333; text-shadow: none;" onclick="insertColor('F0E68C', 'The Color of a Gentlemann\'s Business Pants')" title="The Color of a Gentlemann's Business Pants">Pants</button>
+                        <button class="quality-btn" style="background-color: #7C6C57" onclick="insertColor('7C6C57', 'Ye Olde Rustic Colour')" title="Ye Olde Rustic Colour">Rustic</button>
+                        <button class="quality-btn" style="background-color: #424F3B" onclick="insertColor('424F3B', 'Zepheniah\'s Greed')" title="Zepheniah's Greed">Greed</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -286,55 +501,58 @@
         const BELL_CHAR = String.fromCharCode(7);
         
         // Process text on input
-        messageInput.addEventListener('input', function() {
-            processText();
-        });
+        messageInput.addEventListener('input', processText);
+
+        // Initial process in case of saved form data
+        document.addEventListener('DOMContentLoaded', processText);
         
         function processText() {
             const text = messageInput.value;
-            // Using a regex that looks for the bell character, "color!", bell character, and hex code
-            const colorRegex = new RegExp(BELL_CHAR + "color!" + BELL_CHAR + "([0-9A-Fa-f]{6})([^" + BELL_CHAR + "]*)", "g");
-            
-            let result = '';
-            let lastIndex = 0;
-            let match;
+            // Regex to find: (Bell)color!(Bell)(6-char-hex)(the-text-to-color)
+            const colorRegex = new RegExp(BELL_CHAR + "color!" + BELL_CHAR + "([0-9A-Fa-f]{6})([^" + BELL_CHAR + "]*)", "gi");
             
             output.innerHTML = '';
             
-            // Check if there are any color tags
-            if (text.includes(BELL_CHAR + "color!" + BELL_CHAR)) {
-                while ((match = colorRegex.exec(text)) !== null) {
-                    // Add text before the match if not at the beginning
+            let lastIndex = 0;
+            let match;
+            
+            // Check if any color tags exist
+            if (!text.includes(BELL_CHAR + "color!" + BELL_CHAR)) {
+                output.textContent = text;
+            } else {
+                 while ((match = colorRegex.exec(text)) !== null) {
+                    // 1. Add any plain text *before* this color tag
                     if (match.index > lastIndex) {
                         const plainText = document.createTextNode(text.substring(lastIndex, match.index));
                         output.appendChild(plainText);
                     }
                     
-                    // Add the colored text
+                    // 2. Add the colored text
                     const colorCode = match[1];
                     const coloredText = match[2];
                     
                     const span = document.createElement('span');
                     span.style.color = `#${colorCode}`;
+                    // Use textContent to prevent XSS
                     span.textContent = coloredText;
                     output.appendChild(span);
                     
                     lastIndex = colorRegex.lastIndex;
                 }
                 
-                // Add any remaining text
+                // 3. Add any remaining plain text *after* the last color tag
                 if (lastIndex < text.length) {
                     const plainText = document.createTextNode(text.substring(lastIndex));
                     output.appendChild(plainText);
                 }
-            } else {
-                // No color tags, just display the text normally
-                output.textContent = text;
             }
             
             // If no text, show placeholder
             if (output.innerHTML === '') {
                 output.textContent = 'Type something below to see your colored chat message!';
+                output.style.color = '#888'; // Placeholder color
+            } else {
+                output.style.color = ''; // Reset to default
             }
         }
         
@@ -347,15 +565,26 @@
             const colorTag = BELL_CHAR + "color!" + BELL_CHAR + hexCode;
             const selectedText = currentValue.substring(selectionStart, selectionEnd);
             
+            let textToInsert = colorTag;
+            if (selectedText) {
+                // If text is selected, wrap it with the color
+                textToInsert += selectedText;
+            }
+            
             const newText = currentValue.substring(0, selectionStart) + 
-                            colorTag + selectedText + 
+                            textToInsert + 
                             currentValue.substring(selectionEnd);
             
             messageInput.value = newText;
             messageInput.focus();
             
-            // Set cursor position after the inserted text
-            const newPosition = selectionStart + colorTag.length + selectedText.length;
+            // Set cursor position after the inserted tag (or after the wrapped text)
+            let newPosition;
+            if (selectedText) {
+                newPosition = selectionEnd + colorTag.length;
+            } else {
+                newPosition = selectionStart + colorTag.length;
+            }
             messageInput.selectionStart = newPosition;
             messageInput.selectionEnd = newPosition;
             
@@ -371,22 +600,17 @@
         }
         
         function updateColorPicker() {
-            // Ensure valid hex
-            let hex = hexInput.value;
-            hex = hex.replace(/[^0-9A-Fa-f]/g, '');
+            let hex = hexInput.value.replace(/[^0-9A-Fa-f]/g, '');
             
-            // Pad to 6 characters if needed
-            while (hex.length < 6) {
-                hex += '0';
-            }
-            
-            // Truncate if longer than 6
             if (hex.length > 6) {
                 hex = hex.substring(0, 6);
             }
             
+            // Pad to 6 characters if user is typing
+            let paddedHex = hex.padEnd(6, '0');
+            
             hexInput.value = hex.toUpperCase();
-            colorPicker.value = `#${hex}`;
+            colorPicker.value = `#${paddedHex}`;
         }
         
         function clearText() {
@@ -396,17 +620,33 @@
         
         function copyOutput() {
             const outputText = messageInput.value;
+            const copyButton = document.querySelector('.copy-btn');
             
             if (outputText.trim() === '') {
-                alert('No text to copy!');
+                copyButton.textContent = 'Nothing to copy!';
+                copyButton.style.backgroundColor = '#aa0000';
+                setTimeout(() => {
+                    copyButton.textContent = 'Copy';
+                    copyButton.style.backgroundColor = '#444';
+                }, 2000);
                 return;
             }
             
             navigator.clipboard.writeText(outputText).then(() => {
-                alert('Text copied to clipboard!');
+                copyButton.textContent = 'Copied!';
+                copyButton.style.backgroundColor = '#70B04A'; // Green
+                setTimeout(() => {
+                    copyButton.textContent = 'Copy';
+                    copyButton.style.backgroundColor = '#444';
+                }, 2000);
             }).catch(err => {
                 console.error('Failed to copy text: ', err);
-                alert('Failed to copy text. Please try manually selecting and copying.');
+                copyButton.textContent = 'Failed!';
+                copyButton.style.backgroundColor = '#aa0000'; // Red
+                setTimeout(() => {
+                    copyButton.textContent = 'Copy';
+                    copyButton.style.backgroundColor = '#444';
+                }, 2000);
             });
         }
     </script>
