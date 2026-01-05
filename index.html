@@ -88,6 +88,8 @@
             padding: 20px;
             flex-shrink: 0;
             animation: slideInFromLeft 0.5s ease-out;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar h2 {
@@ -127,6 +129,44 @@
             background-color: var(--tf2-ui-bg);
             color: var(--tf2-header);
             font-weight: bold;
+        }
+
+        /* --- History Section --- */
+        .history-section {
+            margin-top: 30px;
+            flex-grow: 1;
+            overflow-y: auto;
+            border-top: 1px solid #444;
+            padding-top: 15px;
+        }
+
+        .history-section h3 {
+            font-size: 0.9rem;
+            color: var(--tf2-header);
+            margin-bottom: 10px;
+        }
+
+        .history-list {
+            list-style: none;
+            font-size: 0.8rem;
+        }
+
+        .history-item {
+            padding: 8px;
+            background: #222;
+            border-radius: 3px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: background 0.2s;
+            border-left: 2px solid transparent;
+        }
+
+        .history-item:hover {
+            background: #333;
+            border-left: 2px solid var(--tf2-ui-border);
         }
 
         /* --- Main Content Area --- */
@@ -192,6 +232,7 @@
             border-radius: 5px;
             padding: 20px;
             transition: transform 0.25s ease, box-shadow 0.25s ease;
+            margin-bottom: 25px;
         }
         
         .ui-panel:hover {
@@ -226,6 +267,19 @@
             transition: color 0.3s ease;
         }
         
+        .char-counter {
+            text-align: right;
+            font-size: 12px;
+            color: #888;
+            margin-top: -15px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .char-counter.limit-exceeded {
+            color: #ff4444;
+        }
+
         textarea {
             width: 100%;
             height: 120px;
@@ -315,7 +369,7 @@
             padding: 0;
         }
         
-        input[type="text"] {
+        input[type="text"], select {
             background-color: var(--tf2-ui-bg-darker);
             color: var(--tf2-text);
             border: 1px solid #444;
@@ -324,11 +378,17 @@
             font-family: 'Roboto Mono', monospace;
             width: 100px;
         }
+
+        select {
+            width: 100%;
+            margin-bottom: 10px;
+        }
         
         .action-buttons {
             display: flex;
             gap: 10px;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
         
         button {
@@ -341,13 +401,13 @@
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
-            font-family: 'Oswald', sans-serif; /* Changed to Oswald */
+            font-family: 'Oswald', sans-serif;
             font-size: 1rem;
             transition: all 0.2s ease-in-out;
         }
         
         button:hover {
-            background-color: var(--tf2-header); /* Keep this for a brighter feel */
+            background-color: var(--tf2-header);
             transform: scale(1.03);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             filter: brightness(1.1);
@@ -365,7 +425,7 @@
             color: #fff;
             padding: 5px 10px;
             font-size: 12px;
-            font-family: 'Roboto Mono', monospace; /* Keep this font */
+            font-family: 'Roboto Mono', monospace;
             letter-spacing: 0.5px;
             z-index: 10;
         }
@@ -373,6 +433,62 @@
         .copy-btn:hover {
             background-color: #666;
             transform: scale(1.05);
+        }
+
+        /* --- Modal Styling --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--tf2-ui-bg);
+            border: 2px solid var(--tf2-ui-border);
+            padding: 30px;
+            border-radius: 5px;
+            width: 400px;
+            box-shadow: 0 0 20px rgba(255,119,0,0.4);
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-input-group {
+            margin-bottom: 15px;
+        }
+
+        .modal-input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--tf2-header);
+        }
+
+        .modal-input-group input {
+            width: 100%;
+        }
+
+        /* Rainbow Animation */
+        .rainbow-text {
+            background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
     </style>
 </head>
@@ -384,8 +500,14 @@
             <ul>
                 <li><a href="#" class="active">TF2 Chat Creator</a></li>
                 <li><a href="https://kitty-core.github.io/clangen">Clangen Patrol Editor</a></li>
-                </ul>
+            </ul>
         </nav>
+
+        <div class="history-section">
+            <h3>History</h3>
+            <ul class="history-list" id="history-list">
+                </ul>
+        </div>
     </div>
 
     <div class="main-content">
@@ -395,7 +517,7 @@
             <h3>HOW DOES IT WORK!?</h3>
             <p>Type in the box, use the buttons to add color codes, then copy the text.
             <br>
-            Paste it into the TF2 chat. <span class="special-char">NOTE: This only works in TEAM CHAT (or when you are dead).</span>
+            Paste it into the TF2 chat. <span class="special-char">NOTE: 127 character limit applies to the FINAL string.</span>
             </p>
         </div>
         
@@ -407,11 +529,27 @@
                         <div id="output">Type something below to see your colored chat message!</div>
                         <button class="copy-btn" onclick="copyOutput()">Copy</button>
                     </div>
+                    <div class="char-counter" id="char-counter">0 / 127</div>
                     <h3>Input:</h3>
                     <textarea id="message-input" placeholder="Type your message here..."></textarea>
                     <div class="action-buttons">
                         <button onclick="clearText()" style="background-color: #555;">Clear All</button>
+                        <button onclick="openBindModal()">Generate Bind</button>
+                        <button onclick="saveToHistory()" style="background-color: #444;">Save History</button>
                     </div>
+                </div>
+
+                <div class="ui-panel">
+                    <h3>Gradient & Rainbow Tools:</h3>
+                    <div class="color-picker-container">
+                        <input type="color" id="grad-start" value="#FF0000">
+                        <span>to</span>
+                        <input type="color" id="grad-end" value="#0000FF">
+                        <button onclick="applyGradient()">Gradient</button>
+                    </div>
+                    <button class="quality-btn" style="width: 100%; background: linear-gradient(to right, red, orange, yellow, green, blue, rgb(149, 0, 255), rgb(255, 74, 135));" onclick="applyRainbow()">
+                        RAINBOW GENERATOR
+                    </button>
                 </div>
             </div>
 
@@ -477,7 +615,7 @@
                         <button class="quality-btn" style="background-color: #729E42" onclick="insertColor('729E42', 'Indubitably Green')" title="Indubitably Green">Green</button>
                         <button class="quality-btn" style="background-color: #CF7336" onclick="insertColor('CF7336', 'Mann Co. Orange')" title="Mann Co. Orange">Mann Co.</button>
                         <button class="quality-btn" style="background-color: #A57545" onclick="insertColor('A57545', 'Muskelmannbraun')" title="Muskelmannbraun">Brown</button>
-                        <button class="quality-btn" style="background-color: #51384A" onclick="insertColor('51384A', 'Noble Hatter\'s Violet')" title="Noble Hatter's Violet">Violet</button>
+                        <button class="quality-btn" style="background-color: #51384A" onclick="insertColor('51384A', 'Noble Hatter\'s Violet')" title="Noble Hatter\'s Violet">Violet</button>
                         <button class="quality-btn" style="background-color: #C5AF91; color: #333; text-shadow: none;" onclick="insertColor('C5AF91', 'Peculiarly Drab Tincture')" title="Peculiarly Drab Tincture">Tincture</button>
                         <button class="quality-btn" style="background-color: #FF69B4" onclick="insertColor('FF69B4', 'Pink as Hell')" title="Pink as Hell">Pink</button>
                         <button class="quality-btn" style="background-color: #694D3A" onclick="insertColor('694D3A', 'Radigan Conagher Brown')" title="Radigan Conagher Brown">Conagher</button>
@@ -490,69 +628,99 @@
             </div>
         </div>
     </div>
+
+    <div class="modal-overlay" id="bind-modal">
+        <div class="modal-content">
+            <h3>Bind Creator</h3>
+            <div class="modal-input-group">
+                <label>Key to Press:</label>
+                <input type="text" id="bind-key" placeholder="e.g. k" maxlength="10">
+            </div>
+            <div class="modal-input-group">
+                <label>Action Type:</label>
+                <select id="bind-type">
+                    <option value="say_team">Team Say (Recommended for colors)</option>
+                    <option value="say">Kill + Public Say</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeBindModal()" style="background-color: #555;">Cancel</button>
+                <button onclick="applyBind()">Apply</button>
+            </div>
+        </div>
+    </div>
     
     <script>
         const messageInput = document.getElementById('message-input');
         const output = document.getElementById('output');
         const colorPicker = document.getElementById('color-picker');
         const hexInput = document.getElementById('hex-input');
+        const charCounter = document.getElementById('char-counter');
+        const historyList = document.getElementById('history-list');
         
         // Bell character (ASCII 7/hex 07)
         const BELL_CHAR = String.fromCharCode(7);
+        const MAX_CHARS = 127;
         
         // Process text on input
         messageInput.addEventListener('input', processText);
 
-        // Initial process in case of saved form data
-        document.addEventListener('DOMContentLoaded', processText);
+        // Initial process
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHistory();
+            processText();
+        });
         
         function processText() {
             const text = messageInput.value;
+            const currentLen = text.length;
+            
+            // Character Counter Showcase
+            charCounter.textContent = `${currentLen} / ${MAX_CHARS}`;
+            if (currentLen > MAX_CHARS) {
+                charCounter.classList.add('limit-exceeded');
+            } else {
+                charCounter.classList.remove('limit-exceeded');
+            }
+
             // Regex to find: (Bell)color!(Bell)(6-char-hex)(the-text-to-color)
             const colorRegex = new RegExp(BELL_CHAR + "color!" + BELL_CHAR + "([0-9A-Fa-f]{6})([^" + BELL_CHAR + "]*)", "gi");
             
             output.innerHTML = '';
-            
             let lastIndex = 0;
             let match;
             
-            // Check if any color tags exist
             if (!text.includes(BELL_CHAR + "color!" + BELL_CHAR)) {
                 output.textContent = text;
             } else {
                  while ((match = colorRegex.exec(text)) !== null) {
-                    // 1. Add any plain text *before* this color tag
                     if (match.index > lastIndex) {
                         const plainText = document.createTextNode(text.substring(lastIndex, match.index));
                         output.appendChild(plainText);
                     }
                     
-                    // 2. Add the colored text
                     const colorCode = match[1];
                     const coloredText = match[2];
                     
                     const span = document.createElement('span');
                     span.style.color = `#${colorCode}`;
-                    // Use textContent to prevent XSS
                     span.textContent = coloredText;
                     output.appendChild(span);
                     
                     lastIndex = colorRegex.lastIndex;
                 }
                 
-                // 3. Add any remaining plain text *after* the last color tag
                 if (lastIndex < text.length) {
                     const plainText = document.createTextNode(text.substring(lastIndex));
                     output.appendChild(plainText);
                 }
             }
             
-            // If no text, show placeholder
             if (output.innerHTML === '') {
                 output.textContent = 'Type something below to see your colored chat message!';
-                output.style.color = '#888'; // Placeholder color
+                output.style.color = '#888';
             } else {
-                output.style.color = ''; // Reset to default
+                output.style.color = '';
             }
         }
         
@@ -561,34 +729,185 @@
             const selectionEnd = messageInput.selectionEnd;
             const currentValue = messageInput.value;
             
-            // Create the color tag with bell characters
             const colorTag = BELL_CHAR + "color!" + BELL_CHAR + hexCode;
             const selectedText = currentValue.substring(selectionStart, selectionEnd);
             
             let textToInsert = colorTag;
             if (selectedText) {
-                // If text is selected, wrap it with the color
                 textToInsert += selectedText;
             }
             
-            const newText = currentValue.substring(0, selectionStart) + 
-                            textToInsert + 
-                            currentValue.substring(selectionEnd);
-            
+            const newText = currentValue.substring(0, selectionStart) + textToInsert + currentValue.substring(selectionEnd);
             messageInput.value = newText;
             messageInput.focus();
             
-            // Set cursor position after the inserted tag (or after the wrapped text)
-            let newPosition;
-            if (selectedText) {
-                newPosition = selectionEnd + colorTag.length;
-            } else {
-                newPosition = selectionStart + colorTag.length;
-            }
-            messageInput.selectionStart = newPosition;
-            messageInput.selectionEnd = newPosition;
-            
+            let newPosition = selectedText ? selectionEnd + colorTag.length : selectionStart + colorTag.length;
+            messageInput.setSelectionRange(newPosition, newPosition);
             processText();
+        }
+
+        /* --- Gradient Math & System --- */
+        function applyGradient() {
+            const text = messageInput.value || "Sample Text";
+            const startColor = document.getElementById('grad-start').value;
+            const endColor = document.getElementById('grad-end').value;
+            
+            // MATH: Keep under 127 limit
+            // Each tag is 14 chars. \x07color!\x07RRGGBB
+            // Max tags allowed = floor((127 - text_length) / 14)
+            const availableCharsForTags = MAX_CHARS - text.length;
+            const maxTags = Math.floor(availableCharsForTags / 14);
+
+            if (maxTags <= 0) {
+                alert("Text is too long to apply a gradient! Reduce text length.");
+                return;
+            }
+
+            const numSteps = Math.min(text.length, maxTags);
+            const stepSize = text.length / numSteps;
+            let result = "";
+
+            const startRGB = hexToRgb(startColor);
+            const endRGB = hexToRgb(endColor);
+
+            for (let i = 0; i < numSteps; i++) {
+                const ratio = i / (numSteps - 1 || 1);
+                const r = Math.round(startRGB.r + (endRGB.r - startRGB.r) * ratio);
+                const g = Math.round(startRGB.g + (endRGB.g - startRGB.g) * ratio);
+                const b = Math.round(startRGB.b + (endRGB.b - startRGB.b) * ratio);
+                
+                const hex = rgbToHex(r, g, b);
+                const startIdx = Math.floor(i * stepSize);
+                const endIdx = Math.floor((i + 1) * stepSize);
+                const chunk = text.substring(startIdx, endIdx);
+                
+                result += BELL_CHAR + "color!" + BELL_CHAR + hex + chunk;
+            }
+
+            messageInput.value = result;
+            processText();
+        }
+
+        function applyRainbow() {
+            const text = messageInput.value || "RAINBOW!";
+            const rainbowColors = [
+                "#FF0000", "#FF7F00", "#FFFF00", "#00FF00", "#0000FF", "#CC22FF", "#FF7979"
+            ];
+            
+            const availableCharsForTags = MAX_CHARS - text.length;
+            const maxTags = Math.floor(availableCharsForTags / 14);
+            const numSteps = Math.min(text.length, maxTags);
+            const stepSize = text.length / numSteps;
+            
+            let result = "";
+            for (let i = 0; i < numSteps; i++) {
+                const colorIdx = Math.floor((i / numSteps) * rainbowColors.length);
+                const hex = rainbowColors[colorIdx].substring(1);
+                const startIdx = Math.floor(i * stepSize);
+                const endIdx = Math.floor((i + 1) * stepSize);
+                const chunk = text.substring(startIdx, endIdx);
+                result += BELL_CHAR + "color!" + BELL_CHAR + hex + chunk;
+            }
+            messageInput.value = result;
+            processText();
+        }
+
+        /* --- Bind GUI Modal Logic --- */
+        function openBindModal() {
+            document.getElementById('bind-modal').style.display = 'flex';
+        }
+
+        function closeBindModal() {
+            document.getElementById('bind-modal').style.display = 'none';
+        }
+
+        function applyBind() {
+            const key = document.getElementById('bind-key').value || "k";
+            const type = document.getElementById('bind-type').value;
+            let msg = messageInput.value;
+
+            // Clean existing bind if user is re-binding
+            msg = msg.replace(/^bind\s+\S+\s+"(say_team|say|explode; say_team)\s+/, "").replace(/"$/, "");
+
+            let finalCommand = "";
+            if (type === "say_team") finalCommand = `bind ${key} "say_team ${msg}"`;
+            if (type === "say") finalCommand = `bind ${key} "kill ; say ${msg}"`;
+
+            messageInput.value = finalCommand;
+            closeBindModal();
+            processText();
+        }
+
+        /* --- Cookie & History Logic --- */
+        function saveToHistory() {
+            const val = messageInput.value;
+            if (!val.trim()) return;
+
+            let history = getHistory();
+            history = history.filter(h => h !== val); // Remove duplicate
+            history.unshift(val);
+            if (history.length > 10) history.pop();
+
+            setCookie("chat_history", JSON.stringify(history), 30);
+            renderHistory();
+        }
+
+        function loadHistory() {
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const history = getHistory();
+            historyList.innerHTML = '';
+            history.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'history-item';
+                li.textContent = item;
+                li.title = "Click to load";
+                li.onclick = () => {
+                    messageInput.value = item;
+                    processText();
+                };
+                historyList.appendChild(li);
+            });
+        }
+
+        function setCookie(name, value, days) {
+            const d = new Date();
+            d.setTime(d.getTime() + (days*24*60*60*1000));
+            let expires = "expires="+ d.toUTCString();
+            document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/";
+        }
+
+        function getCookie(name) {
+            let nameEQ = name + "=";
+            let ca = document.cookie.split(';');
+            for(let i=0;i < ca.length;i++) {
+                let c = ca[i];
+                while (c.charAt(0)==' ') c = c.substring(1,c.length);
+                if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+            }
+            return null;
+        }
+
+        function getHistory() {
+            const data = getCookie("chat_history");
+            return data ? JSON.parse(data) : [];
+        }
+
+        /* --- Helpers --- */
+        function hexToRgb(hex) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return { r, g, b };
+        }
+
+        function rgbToHex(r, g, b) {
+            return [r, g, b].map(x => {
+                const hex = x.toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('').toUpperCase();
         }
         
         function insertCustomColor() {
@@ -601,14 +920,8 @@
         
         function updateColorPicker() {
             let hex = hexInput.value.replace(/[^0-9A-Fa-f]/g, '');
-            
-            if (hex.length > 6) {
-                hex = hex.substring(0, 6);
-            }
-            
-            // Pad to 6 characters if user is typing
+            if (hex.length > 6) hex = hex.substring(0, 6);
             let paddedHex = hex.padEnd(6, '0');
-            
             hexInput.value = hex.toUpperCase();
             colorPicker.value = `#${paddedHex}`;
         }
@@ -634,15 +947,7 @@
             
             navigator.clipboard.writeText(outputText).then(() => {
                 copyButton.textContent = 'Copied!';
-                copyButton.style.backgroundColor = '#70B04A'; // Green
-                setTimeout(() => {
-                    copyButton.textContent = 'Copy';
-                    copyButton.style.backgroundColor = '#444';
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy text: ', err);
-                copyButton.textContent = 'Failed!';
-                copyButton.style.backgroundColor = '#aa0000'; // Red
+                copyButton.style.backgroundColor = '#70B04A';
                 setTimeout(() => {
                     copyButton.textContent = 'Copy';
                     copyButton.style.backgroundColor = '#444';
