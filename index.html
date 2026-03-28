@@ -264,46 +264,27 @@
             constructor() {
                 this.englishToKittyDict = {
                     "hello": "meow", "hi": "mew", "goodbye": "mraoww",
-                    "yes": "purr", "no": "hiss", "cat": "nya", "kittycore" : "kittycore", ":3" : ":3", ";3" : ";3"
+                    "yes": "purr", "no": "hiss", "cat": "nya", "kittycore": "kittycore", 
+                    ":3": ":3", ";3": ";3"
                 };
 
-                this.kittyToEnglishDict = {};
-                for (const [eng, kitty] of Object.entries(this.englishToKittyDict)) {
-                    this.kittyToEnglishDict[kitty] = eng;
-                }
+                // Bi-directional session mapping to ensure consistent translation back
+                // without using invisible characters.
+                this.sessionMap = new Map(); 
+                this.reverseSessionMap = new Map();
 
                 // Phonetic components for dynamic word construction
                 this.phonetics = {
                     onsets: ["m", "mr", "mrr", "mrrr", "my", "mm", "mmr"],
                     nuclei: ["a", "ao", "e", "ee", "eo", "u", "i", "ow"],
-                    codas: ["w", "ww", "p", "wr", "rrh", "rrr"]
+                    codas: ["w", "ww", "wrh", "wr", "rrh", "rrr"]
                 };
-            }
 
-            // Binary Steganography (Invisible Metadata)
-            stringToZWC(str) {
-                const encoder = new TextEncoder();
-                const bytes = encoder.encode(str);
-                let zwcStr = '';
-                for (let byte of bytes) {
-                    for (let i = 7; i >= 0; i--) {
-                        zwcStr += ((byte >> i) & 1) ? '\u200C' : '\u200B';
-                    }
+                // Initialize maps with dictionary
+                for (const [eng, kitty] of Object.entries(this.englishToKittyDict)) {
+                    this.sessionMap.set(eng, kitty);
+                    this.reverseSessionMap.set(kitty, eng);
                 }
-                return zwcStr;
-            }
-
-            zwcToString(zwcStr) {
-                if (!zwcStr || zwcStr.length % 8 !== 0) return null;
-                const bytes = new Uint8Array(zwcStr.length / 8);
-                for (let i = 0; i < zwcStr.length; i += 8) {
-                    let byte = 0;
-                    for (let j = 0; j < 8; j++) {
-                        if (zwcStr[i + j] === '\u200C') byte |= (1 << (7 - j));
-                    }
-                    bytes[i / 8] = byte;
-                }
-                return new TextDecoder().decode(bytes);
             }
 
             matchCase(source, target) {
@@ -324,17 +305,17 @@
                 }
                 hash = Math.abs(hash);
 
-                // Construct phonetic parts
                 const onset = this.phonetics.onsets[hash % this.phonetics.onsets.length];
                 const nucleus = this.phonetics.nuclei[(hash >> 2) % this.phonetics.nuclei.length];
                 const coda = this.phonetics.codas[(hash >> 4) % this.phonetics.codas.length];
 
-                // Complexity scaling: Add second syllable for long words
                 let result = onset + nucleus + coda;
+                
+                // Complexity scaling for long words
                 if (word.length > 5) {
                     const onset2 = this.phonetics.onsets[(hash >> 6) % this.phonetics.onsets.length];
                     const nucleus2 = this.phonetics.nuclei[(hash >> 8) % this.phonetics.nuclei.length];
-                    result += "\u00A0" + onset2 + nucleus2;
+                    result += "-" + onset2 + nucleus2;
                 }
 
                 return result;
@@ -342,31 +323,40 @@
 
             encodeWord(englishWord) {
                 const lowerEng = englishWord.toLowerCase();
-                let baseCat = this.englishToKittyDict[lowerEng] || this.generatePhoneticMeow(lowerEng);
-                return this.stringToZWC(englishWord) + this.matchCase(englishWord, baseCat);
+                
+                // Check if we already have a mapping for this word in this session
+                if (this.sessionMap.has(lowerEng)) {
+                    return this.matchCase(englishWord, this.sessionMap.get(lowerEng));
+                }
+
+                const kittyWord = this.generatePhoneticMeow(lowerEng);
+                
+                // Store mapping for bidirectional consistency
+                this.sessionMap.set(lowerEng, kittyWord);
+                this.reverseSessionMap.set(kittyWord, lowerEng);
+
+                return this.matchCase(englishWord, kittyWord);
             }
 
             decodeWord(kittyWord) {
-                const zwcMatch = kittyWord.match(/^([\u200B\u200C]+)/);
-                const cleanKitty = kittyWord.replace(/^[\u200B\u200C]+/, '');
-
-                if (zwcMatch) {
-                    const decoded = this.zwcToString(zwcMatch[1]);
-                    if (decoded) return decoded; 
+                const lowerKitty = kittyWord.toLowerCase();
+                
+                // Check if this kitty word was generated or exists in dictionary
+                if (this.reverseSessionMap.has(lowerKitty)) {
+                    return this.matchCase(kittyWord, this.reverseSessionMap.get(lowerKitty));
                 }
 
-                // Fallback for manual typing
-                const raw = cleanKitty.toLowerCase().replace(/\u00A0/g, ' ');
-                return this.kittyToEnglishDict[raw] || cleanKitty;
+                // If not found, return as is (unable to reverse unknown phonetic strings)
+                return kittyWord;
             }
 
             processText(text, direction) {
-                // Tokenizer includes ZWCs and Non-breaking spaces
-                const tokens = text.match(/[\w\u00C0-\u024F\u200B\u200C\u00A0]+|[^\w\u00C0-\u024F\u200B\u200C\u00A0]+/g) || [];
+                // Tokenizer for words and non-word characters
+                const tokens = text.match(/[\w\u00C0-\u024F-]+|[^\w\u00C0-\u024F-]+/g) || [];
                 let result = '';
 
                 for (let token of tokens) {
-                    if (/^[\w\u00C0-\u024F\u200B\u200C\u00A0]+$/.test(token)) {
+                    if (/^[\w\u00C0-\u024F-]+$/.test(token)) {
                         result += (direction === 'toKittyspeak') ? this.encodeWord(token) : this.decodeWord(token);
                     } else {
                         result += token;
@@ -377,11 +367,11 @@
         }
 
         /**
-         * UI Controller with Bidirectional Sync
+         * UI Controller
          */
         const engine = new KittyspeakEngine();
         let currentMode = 'toKittyspeak';
-        let isSyncing = false; // Prevent recursion
+        let isSyncing = false;
 
         const leftInput = document.getElementById('left-input');
         const rightInput = document.getElementById('right-input');
@@ -389,7 +379,6 @@
         const rightLabel = document.getElementById('right-label');
         const swapBtn = document.getElementById('swap-btn');
 
-        // Nav Elements
         const navToggle = document.getElementById('nav-toggle');
         const navMenu = document.getElementById('nav-menu');
 
@@ -416,16 +405,13 @@
             leftLabel.innerText = currentMode === 'toKittyspeak' ? 'English' : 'Kittyspeak';
             rightLabel.innerText = currentMode === 'toKittyspeak' ? 'Kittyspeak' : 'English';
             
-            // Swap visual contents
             const temp = leftInput.value;
             leftInput.value = rightInput.value;
             rightInput.value = temp;
 
-            // Normalize values based on new direction
             sync('left');
         });
 
-        // Navigation Hub Logic
         navToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             navMenu.classList.toggle('active');
