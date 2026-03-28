@@ -1,0 +1,142 @@
+<html>
+<style>
+
+        .nav-hub-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            z-index: 1000;
+        }
+
+        .nav-menu {
+            display: none;
+            flex-direction: column;
+            background-color: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            width: 200px;
+            box-shadow: var(--nav-shadow);
+            transform-origin: bottom right;
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .nav-menu.active {
+            display: flex;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s, color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link:hover {
+            background-color: var(--header-bg);
+            color: var(--accent-hover);
+        }
+
+        .nav-toggle-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--nav-shadow);
+            transition: transform 0.2s;
+        }
+
+        .nav-toggle-btn:hover {
+            background-color: var(--accent-hover);
+            transform: scale(1.05);
+        }
+
+        .nav-toggle-btn svg {
+            width: 28px;
+            height: 28px;
+            fill: currentColor;
+        }
+
+        @media (max-width: 768px) {
+            .translator-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .controls {
+                padding: 1rem 0;
+                justify-content: center;
+            }
+            textarea {
+                min-height: 200px;
+            }
+            .nav-hub-container {
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.vcenter {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+body {
+    background-color: black;
+}
+h1 {
+    font-family: Arial, Helvetica, sans-serif;
+    color: rgb(0, 0, 0);
+}
+</style>
+<head>
+    <title>RIP COLORED CHATS</title>
+</head>
+
+<body>
+    <img src="headstone.png" alt="Headstone Image" class="vcenter" width="500" height="500">
+    <h1 style="text-align: center; text-shadow: 0 0 5px rgb(255, 32, 225);">Goodbye, colored chats. You will be missed greatly.</h1>
+    <h1 style="text-align: center; text-shadow: 0 0 5px rgb(255, 32, 225);">2025-2026</h1>
+  <div class="nav-hub-container" id="nav-hub">
+        <div class="nav-menu" id="nav-menu">
+            <a href="https://kitty-core.github.io/" class="nav-link">
+                <span>🏠</span> Home
+            </a>
+            <a href="https://kitty-core.github.io/colorchat" class="nav-link">
+                <span>🎨</span> Colored Chat
+            </a>
+            <a href="https://kitty-core.github.io/clangen" class="nav-link">
+                <span>🐾</span> Clangen Patrol Editor
+            </a>
+        </div>
+        <button class="nav-toggle-btn" id="nav-toggle" title="Navigate Site">
+            <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"></path></svg>
+        </button>
+    </div>
+</body>
+
+</html>
