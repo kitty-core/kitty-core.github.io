@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kittyspeak Translator</title>
+    <title>Kittyspeak Translator - SCRAPPED</title>
     <style>
         :root {
             /* Pink & White Theme */
@@ -50,6 +50,32 @@
             width: 100%;
             max-width: 1200px;
             height: 450px;
+            position: relative;
+        }
+
+        .scrapped-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-12deg);
+            z-index: 100;
+            pointer-events: none;
+            width: 90%;
+            text-align: center;
+        }
+
+        .scrapped-text {
+            font-family: "Impact", "Arial Black", sans-serif;
+            font-size: 8rem;
+            color: rgba(220, 38, 38, 0.85);
+            text-transform: uppercase;
+            border: 15px solid rgba(220, 38, 38, 0.85);
+            padding: 1rem 3rem;
+            display: inline-block;
+            letter-spacing: 5px;
+            mix-blend-mode: multiply;
+            user-select: none;
+            white-space: nowrap;
         }
 
         .panel {
@@ -61,6 +87,7 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            filter: grayscale(0.5) opacity(0.7);
         }
 
         .panel-header {
@@ -87,34 +114,24 @@
             line-height: 1.5;
         }
 
-        textarea::placeholder {
-            color: var(--border-color);
-        }
-
         .controls {
             display: flex;
             align-items: center;
             padding: 0 0.5rem;
+            opacity: 0.5;
         }
 
         button.swap-btn {
-            background-color: var(--accent);
+            background-color: #9ca3af;
             color: white;
             border: none;
             border-radius: 50%;
             width: 50px;
             height: 50px;
-            cursor: pointer;
+            cursor: not-allowed;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.2s, background-color 0.2s;
-            box-shadow: 0 4px 10px rgba(236, 72, 153, 0.3);
-        }
-
-        button.swap-btn:hover {
-            background-color: var(--accent-hover);
-            transform: rotate(180deg);
         }
 
         button.swap-btn svg {
@@ -200,10 +217,21 @@
             fill: currentColor;
         }
 
+        @media (max-width: 1024px) {
+            .scrapped-text {
+                font-size: 5rem;
+                border-width: 10px;
+            }
+        }
+
         @media (max-width: 768px) {
             .translator-container {
                 flex-direction: column;
                 height: auto;
+            }
+            .scrapped-text {
+                font-size: 3rem;
+                border-width: 6px;
             }
             .controls {
                 padding: 1rem 0;
@@ -211,10 +239,6 @@
             }
             textarea {
                 min-height: 200px;
-            }
-            .nav-hub-container {
-                bottom: 1rem;
-                right: 1rem;
             }
         }
     </style>
@@ -225,20 +249,24 @@
     <p class="subtitle">"WHAT THE FUCK IS KITTYCORE SAYING TO ME??" translator</p>
 
     <div class="translator-container">
+        <div class="scrapped-overlay">
+            <div class="scrapped-text">Scrapped project</div>
+        </div>
+
         <div class="panel">
-            <div class="panel-header" id="left-label">English</div>
-            <textarea id="left-input" placeholder="Enter English text..."></textarea>
+            <div class="panel-header">English</div>
+            <textarea readonly placeholder="DISABLED"></textarea>
         </div>
 
         <div class="controls">
-            <button class="swap-btn" id="swap-btn" title="Swap Languages">
+            <button class="swap-btn" disabled>
                 <svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"></path></svg>
             </button>
         </div>
 
         <div class="panel">
-            <div class="panel-header" id="right-label">Kittyspeak</div>
-            <textarea id="right-input" placeholder="Enter Kittyspeak..."></textarea>
+            <div class="panel-header">Kittyspeak</div>
+            <textarea readonly placeholder="DISABLED"></textarea>
         </div>
     </div>
 
@@ -260,157 +288,9 @@
     </div>
 
     <script>
-        class KittyspeakEngine {
-            constructor() {
-                this.englishToKittyDict = {
-                    "hello": "meow", "hi": "mew", "goodbye": "mraoww",
-                    "yes": "purr", "no": "hiss", "cat": "nya", "kittycore": "kittycore", 
-                    ":3": ":3", ";3": ";3"
-                };
-
-                // Bi-directional session mapping to ensure consistent translation back
-                // without using invisible characters.
-                this.sessionMap = new Map(); 
-                this.reverseSessionMap = new Map();
-
-                // Phonetic components for dynamic word construction
-                this.phonetics = {
-                    onsets: ["m", "mr", "mrr", "mrrr", "my", "mm", "mmr"],
-                    nuclei: ["a", "ao", "e", "ee", "eo", "u", "i", "ow"],
-                    codas: ["w", "ww", "wrh", "wr", "rrh", "rrr"]
-                };
-
-                // Initialize maps with dictionary
-                for (const [eng, kitty] of Object.entries(this.englishToKittyDict)) {
-                    this.sessionMap.set(eng, kitty);
-                    this.reverseSessionMap.set(kitty, eng);
-                }
-            }
-
-            matchCase(source, target) {
-                if (!source || !target) return target;
-                if (source === source.toUpperCase() && source !== source.toLowerCase()) return target.toUpperCase();
-                if (source[0] === source[0].toUpperCase()) return target.charAt(0).toUpperCase() + target.slice(1).toLowerCase();
-                return target.toLowerCase();
-            }
-
-            /**
-             * Generates a unique "meow" phonetically based on the word hash
-             */
-            generatePhoneticMeow(word) {
-                let hash = 0;
-                for (let i = 0; i < word.length; i++) {
-                    hash = ((hash << 5) - hash) + word.charCodeAt(i);
-                    hash |= 0;
-                }
-                hash = Math.abs(hash);
-
-                const onset = this.phonetics.onsets[hash % this.phonetics.onsets.length];
-                const nucleus = this.phonetics.nuclei[(hash >> 2) % this.phonetics.nuclei.length];
-                const coda = this.phonetics.codas[(hash >> 4) % this.phonetics.codas.length];
-
-                let result = onset + nucleus + coda;
-                
-                // Complexity scaling for long words
-                if (word.length > 5) {
-                    const onset2 = this.phonetics.onsets[(hash >> 6) % this.phonetics.onsets.length];
-                    const nucleus2 = this.phonetics.nuclei[(hash >> 8) % this.phonetics.nuclei.length];
-                    result += "-" + onset2 + nucleus2;
-                }
-
-                return result;
-            }
-
-            encodeWord(englishWord) {
-                const lowerEng = englishWord.toLowerCase();
-                
-                // Check if we already have a mapping for this word in this session
-                if (this.sessionMap.has(lowerEng)) {
-                    return this.matchCase(englishWord, this.sessionMap.get(lowerEng));
-                }
-
-                const kittyWord = this.generatePhoneticMeow(lowerEng);
-                
-                // Store mapping for bidirectional consistency
-                this.sessionMap.set(lowerEng, kittyWord);
-                this.reverseSessionMap.set(kittyWord, lowerEng);
-
-                return this.matchCase(englishWord, kittyWord);
-            }
-
-            decodeWord(kittyWord) {
-                const lowerKitty = kittyWord.toLowerCase();
-                
-                // Check if this kitty word was generated or exists in dictionary
-                if (this.reverseSessionMap.has(lowerKitty)) {
-                    return this.matchCase(kittyWord, this.reverseSessionMap.get(lowerKitty));
-                }
-
-                // If not found, return as is (unable to reverse unknown phonetic strings)
-                return kittyWord;
-            }
-
-            processText(text, direction) {
-                // Tokenizer for words and non-word characters
-                const tokens = text.match(/[\w\u00C0-\u024F-]+|[^\w\u00C0-\u024F-]+/g) || [];
-                let result = '';
-
-                for (let token of tokens) {
-                    if (/^[\w\u00C0-\u024F-]+$/.test(token)) {
-                        result += (direction === 'toKittyspeak') ? this.encodeWord(token) : this.decodeWord(token);
-                    } else {
-                        result += token;
-                    }
-                }
-                return result;
-            }
-        }
-
-        /**
-         * UI Controller
-         */
-        const engine = new KittyspeakEngine();
-        let currentMode = 'toKittyspeak';
-        let isSyncing = false;
-
-        const leftInput = document.getElementById('left-input');
-        const rightInput = document.getElementById('right-input');
-        const leftLabel = document.getElementById('left-label');
-        const rightLabel = document.getElementById('right-label');
-        const swapBtn = document.getElementById('swap-btn');
-
+        // Navigator logic
         const navToggle = document.getElementById('nav-toggle');
         const navMenu = document.getElementById('nav-menu');
-
-        function sync(source) {
-            if (isSyncing) return;
-            isSyncing = true;
-
-            if (source === 'left') {
-                rightInput.value = engine.processText(leftInput.value, currentMode);
-            } else {
-                const inverseMode = currentMode === 'toKittyspeak' ? 'toEnglish' : 'toKittyspeak';
-                leftInput.value = engine.processText(rightInput.value, inverseMode);
-            }
-
-            isSyncing = false;
-        }
-
-        leftInput.addEventListener('input', () => sync('left'));
-        rightInput.addEventListener('input', () => sync('right'));
-
-        swapBtn.addEventListener('click', () => {
-            currentMode = currentMode === 'toKittyspeak' ? 'toEnglish' : 'toKittyspeak';
-            
-            leftLabel.innerText = currentMode === 'toKittyspeak' ? 'English' : 'Kittyspeak';
-            rightLabel.innerText = currentMode === 'toKittyspeak' ? 'Kittyspeak' : 'English';
-            
-            const temp = leftInput.value;
-            leftInput.value = rightInput.value;
-            rightInput.value = temp;
-
-            sync('left');
-        });
 
         navToggle.addEventListener('click', (e) => {
             e.stopPropagation();
