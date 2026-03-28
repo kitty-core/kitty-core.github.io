@@ -72,6 +72,122 @@
         </div>
     </div>
 
-    <script src="script.js" defer></script>
+    <script src="script.js" defer>
+        (function() {
+    // 1. Define Styles (Scoped to .khub-namespace)
+    const css = `
+        .khub-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            z-index: 999999;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .khub-menu {
+            display: none;
+            flex-direction: column;
+            background-color: #ffffff;
+            border: 2px solid #f9a8d4;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            width: 240px;
+            box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.3);
+            transform-origin: bottom right;
+            animation: khubPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .khub-menu.active { display: flex; }
+        @keyframes khubPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .khub-link {
+            text-decoration: none;
+            color: #831843;
+            padding: 0.85rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.2s, color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .khub-link:hover {
+            background-color: #fce7f3;
+            color: #db2777;
+        }
+        .khub-toggle-btn {
+            background-color: #ec4899;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.3);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .khub-toggle-btn:hover {
+            background-color: #db2777;
+            transform: scale(1.05);
+        }
+        .khub-toggle-btn svg { width: 28px; height: 28px; fill: currentColor; }
+        @media (max-width: 768px) {
+            .khub-container { bottom: 1rem; right: 1rem; }
+        }
+    `;
+
+    // 2. Inject Styles
+    const styleSheet = document.createElement("style");
+    styleSheet.innerText = css;
+    document.head.appendChild(styleSheet);
+
+    // 3. Create HTML Structure
+    const container = document.createElement('div');
+    container.className = 'khub-container';
+    container.id = 'khub-root';
+
+    container.innerHTML = `
+        <div class="khub-menu" id="khub-menu">
+            <a href="https://kitty-core.github.io/" class="khub-link">
+                <span>🏠</span> Kittyspeak
+            </a>
+            <a href="https://kitty-core.github.io/coloredchat" class="khub-link">
+                <span>🎨</span> Colored Chat memorial
+            </a>
+            <a href="https://kitty-core.github.io/clangen" class="khub-link">
+                <span>🐾</span> Clangen Patrol Editor
+            </a>
+        </div>
+        <button class="khub-toggle-btn" id="khub-toggle" title="Navigate Site">
+            <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"></path></svg>
+        </button>
+    `;
+
+    document.body.appendChild(container);
+
+    // 4. Logic
+    const toggle = document.getElementById('khub-toggle');
+    const menu = document.getElementById('khub-menu');
+
+    toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!container.contains(e.target)) {
+            menu.classList.remove('active');
+        }
+    });
+})();
+    </script>
 </body>
 </html>
