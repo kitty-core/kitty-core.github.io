@@ -1,32 +1,441 @@
-<html>
-<style>
-img {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-.vcenter {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-
-}
-body {
-    background-color: black;
-}
-h1 {
-    font-family: Arial, Helvetica, sans-serif;
-    color: rgb(0, 0, 0);
-}
-</style>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>RIP COLORED CHATS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kittyspeak Translator</title>
+    <style>
+        :root {
+            /* Pink & White Theme */
+            --bg-color: #fdf2f8;
+            --panel-bg: #ffffff;
+            --border-color: #f9a8d4;
+            --text-primary: #831843;
+            --text-secondary: #be185d;
+            --accent: #ec4899;
+            --accent-hover: #db2777;
+            --header-bg: #fce7f3;
+            /* Nav Hub Variables */
+            --nav-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        p.subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .translator-container {
+            display: flex;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1200px;
+            height: 450px;
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel-header {
+            padding: 0.85rem 1.25rem;
+            background-color: var(--header-bg);
+            border-bottom: 2px solid var(--border-color);
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            padding: 1.25rem;
+            font-family: "SF Mono", "Fira Code", monospace;
+            font-size: 1.1rem;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+        }
+
+        textarea::placeholder {
+            color: var(--border-color);
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            padding: 0 0.5rem;
+        }
+
+        button.swap-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, background-color 0.2s;
+            box-shadow: 0 4px 10px rgba(236, 72, 153, 0.3);
+        }
+
+        button.swap-btn:hover {
+            background-color: var(--accent-hover);
+            transform: rotate(180deg);
+        }
+
+        button.swap-btn svg {
+            fill: currentColor;
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Nav Hub Styling */
+        .nav-hub-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            z-index: 1000;
+        }
+
+        .nav-menu {
+            display: none;
+            flex-direction: column;
+            background-color: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            width: 200px;
+            box-shadow: var(--nav-shadow);
+            transform-origin: bottom right;
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .nav-menu.active {
+            display: flex;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s, color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link:hover {
+            background-color: var(--header-bg);
+            color: var(--accent-hover);
+        }
+
+        .nav-toggle-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--nav-shadow);
+            transition: transform 0.2s;
+        }
+
+        .nav-toggle-btn:hover {
+            background-color: var(--accent-hover);
+            transform: scale(1.05);
+        }
+
+        .nav-toggle-btn svg {
+            width: 28px;
+            height: 28px;
+            fill: currentColor;
+        }
+
+        @media (max-width: 768px) {
+            .translator-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .controls {
+                padding: 1rem 0;
+                justify-content: center;
+            }
+            textarea {
+                min-height: 200px;
+            }
+            .nav-hub-container {
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+    </style>
 </head>
-
 <body>
-    <img src="headstone.png" alt="Headstone Image" class="vcenter" width="500" height="500">
-    <h1 style="text-align: center; text-shadow: 0 0 5px rgb(255, 32, 225);">Goodbye, colored chats. You will be missed greatly.</h1>
-    <h1 style="text-align: center; text-shadow: 0 0 5px rgb(255, 32, 225);">2025-2026</h1>
-</body>
 
+    <h1>Kittyspeak Translator</h1>
+    <p class="subtitle">"WHAT THE FUCK IS KITTYCORE SAYING TO ME??" translator</p>
+
+    <div class="translator-container">
+        <div class="panel">
+            <div class="panel-header" id="left-label">English</div>
+            <textarea id="left-input" placeholder="Enter English text..."></textarea>
+        </div>
+
+        <div class="controls">
+            <button class="swap-btn" id="swap-btn" title="Swap Languages">
+                <svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"></path></svg>
+            </button>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header" id="right-label">Kittyspeak</div>
+            <textarea id="right-input" placeholder="Enter Kittyspeak..."></textarea>
+        </div>
+    </div>
+
+    <div class="nav-hub-container" id="nav-hub">
+        <div class="nav-menu" id="nav-menu">
+            <a href="https://kitty-core.github.io/" class="nav-link">
+                <span>🏠</span> Home
+            </a>
+            <a href="https://kitty-core.github.io/colorchat" class="nav-link">
+                <span>🎨</span> Colored Chat
+            </a>
+            <a href="https://kitty-core.github.io/clangen" class="nav-link">
+                <span>🐾</span> Clangen Patrol Editor
+            </a>
+        </div>
+        <button class="nav-toggle-btn" id="nav-toggle" title="Navigate Site">
+            <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"></path></svg>
+        </button>
+    </div>
+
+    <script>
+        class KittyspeakEngine {
+            constructor() {
+                this.englishToKittyDict = {
+                    "hello": "meow", "hi": "mew", "goodbye": "mraoww",
+                    "yes": "purr", "no": "hiss", "cat": "nya", "kittycore" : "kittycore", ":3" : ":3", ";3" : ";3"
+                };
+
+                this.kittyToEnglishDict = {};
+                for (const [eng, kitty] of Object.entries(this.englishToKittyDict)) {
+                    this.kittyToEnglishDict[kitty] = eng;
+                }
+
+                // Phonetic components for dynamic word construction
+                this.phonetics = {
+                    onsets: ["m", "mr", "mrr", "mrrr", "ny", "n", "mmr"],
+                    nuclei: ["a", "ao", "e", "ee", "eo", "u", "i", "ow"],
+                    codas: ["w", "ww", "p", "n", "rrh", "rrr"]
+                };
+            }
+
+            // Binary Steganography (Invisible Metadata)
+            stringToZWC(str) {
+                const encoder = new TextEncoder();
+                const bytes = encoder.encode(str);
+                let zwcStr = '';
+                for (let byte of bytes) {
+                    for (let i = 7; i >= 0; i--) {
+                        zwcStr += ((byte >> i) & 1) ? '\u200C' : '\u200B';
+                    }
+                }
+                return zwcStr;
+            }
+
+            zwcToString(zwcStr) {
+                if (!zwcStr || zwcStr.length % 8 !== 0) return null;
+                const bytes = new Uint8Array(zwcStr.length / 8);
+                for (let i = 0; i < zwcStr.length; i += 8) {
+                    let byte = 0;
+                    for (let j = 0; j < 8; j++) {
+                        if (zwcStr[i + j] === '\u200C') byte |= (1 << (7 - j));
+                    }
+                    bytes[i / 8] = byte;
+                }
+                return new TextDecoder().decode(bytes);
+            }
+
+            matchCase(source, target) {
+                if (!source || !target) return target;
+                if (source === source.toUpperCase() && source !== source.toLowerCase()) return target.toUpperCase();
+                if (source[0] === source[0].toUpperCase()) return target.charAt(0).toUpperCase() + target.slice(1).toLowerCase();
+                return target.toLowerCase();
+            }
+
+            /**
+             * Generates a unique "meow" phonetically based on the word hash
+             */
+            generatePhoneticMeow(word) {
+                let hash = 0;
+                for (let i = 0; i < word.length; i++) {
+                    hash = ((hash << 5) - hash) + word.charCodeAt(i);
+                    hash |= 0;
+                }
+                hash = Math.abs(hash);
+
+                // Construct phonetic parts
+                const onset = this.phonetics.onsets[hash % this.phonetics.onsets.length];
+                const nucleus = this.phonetics.nuclei[(hash >> 2) % this.phonetics.nuclei.length];
+                const coda = this.phonetics.codas[(hash >> 4) % this.phonetics.codas.length];
+
+                // Complexity scaling: Add second syllable for long words
+                let result = onset + nucleus + coda;
+                if (word.length > 5) {
+                    const onset2 = this.phonetics.onsets[(hash >> 6) % this.phonetics.onsets.length];
+                    const nucleus2 = this.phonetics.nuclei[(hash >> 8) % this.phonetics.nuclei.length];
+                    result += "\u00A0" + onset2 + nucleus2;
+                }
+
+                return result;
+            }
+
+            encodeWord(englishWord) {
+                const lowerEng = englishWord.toLowerCase();
+                let baseCat = this.englishToKittyDict[lowerEng] || this.generatePhoneticMeow(lowerEng);
+                return this.stringToZWC(englishWord) + this.matchCase(englishWord, baseCat);
+            }
+
+            decodeWord(kittyWord) {
+                const zwcMatch = kittyWord.match(/^([\u200B\u200C]+)/);
+                const cleanKitty = kittyWord.replace(/^[\u200B\u200C]+/, '');
+
+                if (zwcMatch) {
+                    const decoded = this.zwcToString(zwcMatch[1]);
+                    if (decoded) return decoded; 
+                }
+
+                // Fallback for manual typing
+                const raw = cleanKitty.toLowerCase().replace(/\u00A0/g, ' ');
+                return this.kittyToEnglishDict[raw] || cleanKitty;
+            }
+
+            processText(text, direction) {
+                // Tokenizer includes ZWCs and Non-breaking spaces
+                const tokens = text.match(/[\w\u00C0-\u024F\u200B\u200C\u00A0]+|[^\w\u00C0-\u024F\u200B\u200C\u00A0]+/g) || [];
+                let result = '';
+
+                for (let token of tokens) {
+                    if (/^[\w\u00C0-\u024F\u200B\u200C\u00A0]+$/.test(token)) {
+                        result += (direction === 'toKittyspeak') ? this.encodeWord(token) : this.decodeWord(token);
+                    } else {
+                        result += token;
+                    }
+                }
+                return result;
+            }
+        }
+
+        /**
+         * UI Controller with Bidirectional Sync
+         */
+        const engine = new KittyspeakEngine();
+        let currentMode = 'toKittyspeak';
+        let isSyncing = false; // Prevent recursion
+
+        const leftInput = document.getElementById('left-input');
+        const rightInput = document.getElementById('right-input');
+        const leftLabel = document.getElementById('left-label');
+        const rightLabel = document.getElementById('right-label');
+        const swapBtn = document.getElementById('swap-btn');
+
+        // Nav Elements
+        const navToggle = document.getElementById('nav-toggle');
+        const navMenu = document.getElementById('nav-menu');
+
+        function sync(source) {
+            if (isSyncing) return;
+            isSyncing = true;
+
+            if (source === 'left') {
+                rightInput.value = engine.processText(leftInput.value, currentMode);
+            } else {
+                const inverseMode = currentMode === 'toKittyspeak' ? 'toEnglish' : 'toKittyspeak';
+                leftInput.value = engine.processText(rightInput.value, inverseMode);
+            }
+
+            isSyncing = false;
+        }
+
+        leftInput.addEventListener('input', () => sync('left'));
+        rightInput.addEventListener('input', () => sync('right'));
+
+        swapBtn.addEventListener('click', () => {
+            currentMode = currentMode === 'toKittyspeak' ? 'toEnglish' : 'toKittyspeak';
+            
+            leftLabel.innerText = currentMode === 'toKittyspeak' ? 'English' : 'Kittyspeak';
+            rightLabel.innerText = currentMode === 'toKittyspeak' ? 'Kittyspeak' : 'English';
+            
+            // Swap visual contents
+            const temp = leftInput.value;
+            leftInput.value = rightInput.value;
+            rightInput.value = temp;
+
+            // Normalize values based on new direction
+            sync('left');
+        });
+
+        // Navigation Hub Logic
+        navToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navMenu.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!document.getElementById('nav-hub').contains(e.target)) {
+                navMenu.classList.remove('active');
+            }
+        });
+    </script>
+</body>
 </html>
